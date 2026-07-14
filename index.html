@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Linear Triage</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -93,7 +95,22 @@
     .pane-title a { color: inherit; text-decoration: none; }
     .pane-title a:hover { color: #818cf8; }
 
-    .pane-desc { font-size: 14px; color: #777; line-height: 1.6; max-height: 160px; overflow-y: auto; }
+    .pane-desc {
+      font-size: 14px; color: #aaa; line-height: 1.7;
+      max-height: calc(100vh - 380px); overflow-y: auto;
+    }
+    /* Rendered markdown */
+    .pane-desc h1, .pane-desc h2, .pane-desc h3 { color: #e2e2e2; margin: 12px 0 6px; font-size: 14px; }
+    .pane-desc p  { margin: 0 0 8px; }
+    .pane-desc ul, .pane-desc ol { padding-left: 20px; margin: 0 0 8px; }
+    .pane-desc li { margin: 3px 0; }
+    .pane-desc code { background: #1e1e24; border: 1px solid #2a2a2e; border-radius: 3px; padding: 1px 5px; font-size: 12px; color: #c4b5fd; font-family: monospace; }
+    .pane-desc pre  { background: #1e1e24; border: 1px solid #2a2a2e; border-radius: 6px; padding: 12px; overflow-x: auto; margin: 0 0 8px; }
+    .pane-desc pre code { background: none; border: none; padding: 0; color: #c4b5fd; }
+    .pane-desc a { color: #818cf8; }
+    .pane-desc blockquote { border-left: 3px solid #333; padding-left: 12px; color: #666; margin: 0 0 8px; }
+    .pane-desc strong { color: #e2e2e2; }
+    .pane-desc hr { border: none; border-top: 1px solid #222; margin: 10px 0; }
 
     .vote-indicator {
       display: flex; align-items: center; gap: 8px; font-size: 13px;
@@ -247,6 +264,7 @@
     <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
     <button class="hdr-btn" id="list-view-btn">List view</button>
     <button class="hdr-btn dl" id="download-btn">⬇ Export MD</button>
+    <button class="hdr-btn" id="fullscreen-btn">⛶ Fullscreen</button>
     <button class="hdr-btn" id="restart-btn">← Load new</button>
   </div>
 
@@ -446,6 +464,19 @@
   document.getElementById('download-btn').addEventListener('click', exportMarkdown);
   document.getElementById('download-btn-list').addEventListener('click', exportMarkdown);
 
+  // Fullscreen toggle
+  const fsBtn = document.getElementById('fullscreen-btn');
+  fsBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    fsBtn.textContent = document.fullscreenElement ? '✕ Exit fullscreen' : '⛶ Fullscreen';
+  });
+
   // ── Triage render ──────────────────────────────────────────────────────────
   const PRIORITY_COLORS = { 0:'#555', 1:'#ef4444', 2:'#f97316', 3:'#eab308', 4:'#22c55e' };
   const PRIORITY_NAMES  = { 0:'No priority', 1:'Urgent', 2:'High', 3:'Medium', 4:'Low' };
@@ -478,8 +509,13 @@
     `;
 
     paneTitle.innerHTML = `<a href="https://linear.app/issue/${issue.identifier}" target="_blank" rel="noopener">${issue.title}</a>`;
-    paneDesc.textContent = issue.description || '';
-    paneDesc.style.display = issue.description ? 'block' : 'none';
+    if (issue.description) {
+      paneDesc.innerHTML = DOMPurify.sanitize(marked.parse(issue.description));
+      paneDesc.style.display = 'block';
+    } else {
+      paneDesc.innerHTML = '';
+      paneDesc.style.display = 'none';
+    }
 
     // Vote badge
     if (vote === 'up')   voteIndicator.innerHTML = `<span class="vote-badge up">👍 Up-voted</span>`;
