@@ -6,69 +6,150 @@
   <title>Linear Triage</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0f0f10;
-      color: #e2e2e2;
-      min-height: 100vh;
+      background: #0f0f10; color: #e2e2e2; min-height: 100vh;
+      display: flex; flex-direction: column;
     }
 
-    header {
-      padding: 14px 24px;
-      border-bottom: 1px solid #222;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      position: sticky;
-      top: 0;
-      background: #0f0f10;
-      z-index: 10;
+    /* ── LOAD SCREEN ─────────────────────────────────────────────────────── */
+    #load-screen {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 20px; padding: 40px;
     }
-    header h1 { font-size: 18px; font-weight: 600; color: #fff; flex: 0 0 auto; }
-    .token-row { display: flex; gap: 8px; align-items: center; flex: 1; }
+    #load-screen h1 { font-size: 24px; color: #fff; }
+    .load-card {
+      background: #16161a; border: 1px solid #2a2a2e; border-radius: 10px;
+      padding: 24px; width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .load-card label { font-size: 12px; color: #666; display: block; margin-bottom: 4px; }
     input[type="text"], input[type="password"], select, textarea {
       background: #1a1a1e; border: 1px solid #333; color: #e2e2e2;
-      border-radius: 6px; padding: 6px 10px; font-size: 13px; outline: none;
+      border-radius: 6px; padding: 8px 12px; font-size: 13px; outline: none; width: 100%;
     }
-    input[type="text"]:focus, input[type="password"]:focus, select:focus, textarea:focus { border-color: #5865f2; }
-    #token-input { width: 280px; }
-
-    button {
-      background: #5865f2; color: #fff; border: none; border-radius: 6px;
-      padding: 6px 14px; font-size: 13px; cursor: pointer; white-space: nowrap;
+    input:focus, select:focus, textarea:focus { border-color: #5865f2; }
+    .mode-row { display: flex; gap: 0; border-radius: 6px; overflow: hidden; border: 1px solid #333; }
+    .mode-tab-btn {
+      flex: 1; padding: 8px; font-size: 12px; background: #1a1a1e; border: none;
+      color: #666; cursor: pointer; transition: all 0.15s;
     }
-    button:hover { background: #4752c4; }
-    button:disabled { opacity: 0.5; cursor: default; }
-    button.secondary { background: #1a1a1e; color: #888; border: 1px solid #333; }
-    button.secondary:hover { background: #222; color: #e2e2e2; }
-
-    .mode-tabs {
-      display: flex; gap: 0; border-bottom: 1px solid #222;
-      padding: 0 24px; background: #0f0f10;
-    }
-    .mode-tab {
-      padding: 9px 18px; font-size: 13px; color: #666; cursor: pointer;
-      border-bottom: 2px solid transparent; background: none; border-radius: 0;
-    }
-    .mode-tab:hover { color: #aaa; background: none; }
-    .mode-tab.active { color: #818cf8; border-bottom-color: #818cf8; background: none; }
-
-    .fetch-panel {
-      display: none; padding: 12px 24px; border-bottom: 1px solid #1a1a1e;
-      gap: 8px; align-items: flex-start; flex-wrap: wrap; background: #0f0f10;
-    }
-    .fetch-panel.active { display: flex; }
-
-    .panel-col { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-    .panel-row { display: flex; gap: 8px; align-items: flex-start; }
-    textarea { width: 100%; min-height: 72px; resize: vertical; font-family: monospace; font-size: 12px; line-height: 1.5; }
+    .mode-tab-btn:hover { background: #222; color: #aaa; }
+    .mode-tab-btn.active { background: #5865f2; color: #fff; }
+    .source-panel { display: none; flex-direction: column; gap: 10px; }
+    .source-panel.active { display: flex; }
+    textarea.id-list { min-height: 80px; resize: vertical; font-family: monospace; font-size: 12px; line-height: 1.6; }
     .hint { font-size: 11px; color: #555; }
+    button.primary {
+      background: #5865f2; color: #fff; border: none; border-radius: 6px;
+      padding: 10px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;
+    }
+    button.primary:hover { background: #4752c4; }
+    button.primary:disabled { opacity: 0.5; cursor: default; }
 
-    .filter-bar {
-      display: flex; gap: 8px; align-items: center;
-      padding: 10px 24px; border-bottom: 1px solid #1a1a1e;
+    .error-msg {
+      background: #2a0a0a; border: 1px solid #ef4444; color: #f87171;
+      border-radius: 6px; padding: 10px 14px; font-size: 13px; width: 100%; max-width: 520px;
+    }
+
+    /* ── TRIAGE SCREEN ───────────────────────────────────────────────────── */
+    #triage-screen { flex: 1; display: none; flex-direction: column; }
+
+    .triage-header {
+      padding: 12px 24px; border-bottom: 1px solid #1e1e24;
+      display: flex; align-items: center; gap: 12px; background: #0f0f10;
+    }
+    .triage-header h1 { font-size: 16px; font-weight: 600; color: #fff; }
+    .progress-text { font-size: 13px; color: #555; }
+    .progress-bar-wrap { flex: 1; height: 4px; background: #1e1e24; border-radius: 2px; max-width: 200px; }
+    .progress-bar { height: 100%; background: #5865f2; border-radius: 2px; transition: width 0.2s; }
+    .hdr-btn {
+      background: #1a1a1e; border: 1px solid #2a2a2e; color: #888; border-radius: 6px;
+      padding: 5px 12px; font-size: 12px; cursor: pointer; white-space: nowrap;
+    }
+    .hdr-btn:hover { background: #222; color: #e2e2e2; }
+    .hdr-btn.dl { background: #14532d; border-color: #22c55e; color: #22c55e; }
+    .hdr-btn.dl:hover { background: #166534; }
+
+    .triage-body {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 32px 24px; overflow-y: auto;
+    }
+
+    .issue-pane {
+      width: 100%; max-width: 700px; background: #16161a; border: 1px solid #2a2a2e;
+      border-radius: 12px; padding: 28px 32px; display: flex; flex-direction: column; gap: 16px;
+      position: relative;
+    }
+    .issue-pane.voted-up   { border-color: #22c55e; box-shadow: 0 0 0 1px #22c55e22; }
+    .issue-pane.voted-down { border-color: #ef4444; box-shadow: 0 0 0 1px #ef444422; }
+
+    .pane-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .pane-id { font-size: 12px; color: #555; font-family: monospace; }
+    .pane-state { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #1e1e24; border: 1px solid #2a2a2e; color: #888; }
+    .priority-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .pane-label { font-size: 11px; padding: 2px 7px; border-radius: 4px; background: #1e1e2e; border: 1px solid #2e2e4e; color: #818cf8; }
+
+    .pane-title { font-size: 20px; font-weight: 600; color: #fff; line-height: 1.35; }
+    .pane-title a { color: inherit; text-decoration: none; }
+    .pane-title a:hover { color: #818cf8; }
+
+    .pane-desc { font-size: 14px; color: #777; line-height: 1.6; max-height: 160px; overflow-y: auto; }
+
+    .vote-indicator {
+      display: flex; align-items: center; gap: 8px; font-size: 13px;
+      min-height: 24px;
+    }
+    .vote-badge {
+      padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .vote-badge.up   { background: #14532d; color: #22c55e; border: 1px solid #22c55e; }
+    .vote-badge.down { background: #450a0a; color: #ef4444; border: 1px solid #ef4444; }
+    .vote-badge.none { background: #1a1a1e; color: #555; border: 1px solid #2a2a2e; }
+
+    /* Comment area */
+    .comment-area { display: none; flex-direction: column; gap: 6px; }
+    .comment-area.open { display: flex; }
+    .comment-area textarea {
+      font-size: 13px; line-height: 1.5; min-height: 72px; resize: vertical;
+    }
+    .comment-actions { display: flex; gap: 8px; align-items: center; }
+    .comment-save {
+      background: #5865f2; color: #fff; border: none; border-radius: 6px;
+      padding: 5px 14px; font-size: 12px; cursor: pointer;
+    }
+    .comment-save:hover { background: #4752c4; }
+    .comment-cancel {
+      background: none; border: 1px solid #333; color: #666; border-radius: 6px;
+      padding: 5px 14px; font-size: 12px; cursor: pointer;
+    }
+    .comment-cancel:hover { color: #aaa; border-color: #555; }
+    .comment-hint { font-size: 11px; color: #444; }
+
+    .saved-comment {
+      background: #1a1a1e; border: 1px solid #2a2a2e; border-radius: 6px;
+      padding: 10px 14px; font-size: 13px; color: #aaa; line-height: 1.5;
+      cursor: pointer; white-space: pre-wrap;
+    }
+    .saved-comment:hover { border-color: #444; color: #ccc; }
+    .saved-comment-label { font-size: 10px; color: #444; margin-bottom: 4px; }
+
+    .triage-footer {
+      padding: 12px 24px; border-top: 1px solid #1e1e24;
+      display: flex; align-items: center; justify-content: center; gap: 20px;
       background: #0f0f10; flex-wrap: wrap;
+    }
+    .key-hint { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #444; }
+    kbd {
+      background: #1a1a1e; border: 1px solid #333; border-radius: 4px;
+      padding: 2px 6px; font-size: 11px; font-family: monospace; color: #888;
+    }
+
+    /* ── LIST SCREEN ─────────────────────────────────────────────────────── */
+    #list-screen { display: none; flex-direction: column; }
+
+    .list-header {
+      padding: 12px 24px; border-bottom: 1px solid #1e1e24;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #0f0f10;
     }
     .filter-btn {
       background: #1a1a1e; border: 1px solid #2a2a2e; color: #aaa;
@@ -76,273 +157,212 @@
     }
     .filter-btn:hover { background: #222; color: #e2e2e2; }
     .filter-btn.active { background: #5865f2; border-color: #5865f2; color: #fff; }
-    #search { width: 200px; }
-    .count { font-size: 12px; color: #555; margin-left: auto; }
+    #search { width: 180px; padding: 5px 10px; }
+    .count-label { font-size: 12px; color: #444; }
 
-    main { max-width: 900px; margin: 0 auto; padding: 16px 24px; }
-    .issue-list { display: flex; flex-direction: column; gap: 8px; }
-
-    .issue-card {
+    .issue-grid { padding: 16px 24px; display: flex; flex-direction: column; gap: 8px; max-width: 900px; margin: 0 auto; width: 100%; }
+    .grid-card {
       background: #16161a; border: 1px solid #222; border-radius: 8px;
       padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start;
-      transition: border-color 0.15s;
+      cursor: pointer; transition: border-color 0.1s;
     }
-    .issue-card:hover { border-color: #333; }
-    .issue-card.voted-up   { border-left: 3px solid #22c55e; }
-    .issue-card.voted-down { border-left: 3px solid #ef4444; }
-
-    .vote-col {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 2px; flex: 0 0 auto; padding-top: 2px;
-    }
-    .vote-btn {
+    .grid-card:hover { border-color: #333; }
+    .grid-card.voted-up   { border-left: 3px solid #22c55e; }
+    .grid-card.voted-down { border-left: 3px solid #ef4444; }
+    .grid-vote-col { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 0 0 auto; padding-top: 2px; }
+    .grid-vote-btn {
       background: none; border: 1px solid #2a2a2e; color: #555; border-radius: 4px;
-      width: 28px; height: 24px; padding: 0; font-size: 13px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; transition: all 0.1s;
+      width: 26px; height: 22px; padding: 0; font-size: 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
     }
-    .vote-btn:hover { background: #222; color: #aaa; border-color: #444; }
-    .vote-btn.up.active   { background: #14532d; border-color: #22c55e; color: #22c55e; }
-    .vote-btn.down.active { background: #450a0a; border-color: #ef4444; color: #ef4444; }
-
-    .issue-body { flex: 1; min-width: 0; }
-    .issue-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
-    .issue-id { font-size: 11px; color: #555; font-family: monospace; }
-    .priority-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
-    .state-badge {
-      font-size: 10px; padding: 2px 7px; border-radius: 10px;
-      background: #1e1e24; border: 1px solid #2a2a2e; color: #888; text-transform: capitalize;
-    }
-    .issue-title { font-size: 14px; color: #e2e2e2; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .issue-title a { color: inherit; text-decoration: none; }
-    .issue-title a:hover { color: #818cf8; }
-    .issue-desc { font-size: 12px; color: #666; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .issue-footer { display: flex; gap: 8px; margin-top: 5px; align-items: center; flex-wrap: wrap; }
-    .label-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #1e1e2e; border: 1px solid #2e2e4e; color: #818cf8; }
-    .assignee { font-size: 11px; color: #555; }
-    .created { font-size: 11px; color: #444; margin-left: auto; }
-
-    .empty   { text-align: center; color: #444; padding: 60px 0; font-size: 14px; }
-    .loading { text-align: center; color: #555; padding: 40px 0; font-size: 14px; }
-    .error-msg {
-      background: #2a0a0a; border: 1px solid #ef4444; color: #f87171;
-      border-radius: 6px; padding: 10px 14px; margin: 12px 24px 0; font-size: 13px;
-    }
+    .grid-vote-btn:hover { background: #222; color: #aaa; }
+    .grid-vote-btn.up.active   { background: #14532d; border-color: #22c55e; color: #22c55e; }
+    .grid-vote-btn.down.active { background: #450a0a; border-color: #ef4444; color: #ef4444; }
+    .grid-body { flex: 1; min-width: 0; }
+    .grid-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; flex-wrap: wrap; }
+    .grid-id { font-size: 11px; color: #555; font-family: monospace; }
+    .grid-state { font-size: 10px; padding: 2px 6px; border-radius: 10px; background: #1e1e24; border: 1px solid #2a2a2e; color: #777; }
+    .grid-title { font-size: 13px; color: #e2e2e2; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .grid-title a { color: inherit; text-decoration: none; }
+    .grid-title a:hover { color: #818cf8; }
+    .grid-comment { font-size: 11px; color: #555; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
   </style>
 </head>
 <body>
 
-<header>
+<!-- ── LOAD SCREEN ────────────────────────────────────────────────────────── -->
+<div id="load-screen">
   <h1>Linear Triage</h1>
-  <div class="token-row">
-    <input type="password" id="token-input" placeholder="Linear API token (lin_api_…)" autocomplete="off" />
-    <button class="secondary" id="clear-votes-btn">Clear votes</button>
-  </div>
-</header>
+  <div class="load-card">
+    <div>
+      <label>Linear API Token</label>
+      <input type="password" id="token-input" placeholder="lin_api_…" autocomplete="off" />
+    </div>
 
-<div class="mode-tabs">
-  <button class="mode-tab active" data-mode="list">Issue list</button>
-  <button class="mode-tab" data-mode="view">By view URL</button>
-  <button class="mode-tab" data-mode="team">By team</button>
+    <div>
+      <label>Load issues from</label>
+      <div class="mode-row">
+        <button class="mode-tab-btn active" data-src="list">Issue list</button>
+        <button class="mode-tab-btn" data-src="view">View URL</button>
+        <button class="mode-tab-btn" data-src="team">Team</button>
+      </div>
+    </div>
+
+    <!-- Issue list -->
+    <div class="source-panel active" id="src-list">
+      <textarea class="id-list" id="id-list-input" placeholder="YOU-21931&#10;YOU-21906, YOU-20423&#10;YOU-21787"></textarea>
+      <span class="hint">One per line or comma-separated. Ctrl+Enter to load.</span>
+    </div>
+
+    <!-- View URL -->
+    <div class="source-panel" id="src-view">
+      <input type="text" id="view-url-input" placeholder="https://linear.app/…/view/…" />
+      <span class="hint">Paste any Linear custom view or board URL.</span>
+    </div>
+
+    <!-- Team -->
+    <div class="source-panel" id="src-team">
+      <input type="text" id="team-input" placeholder="Team key, e.g. YOU" />
+      <select id="state-select">
+        <option value="">All states</option>
+        <option value="Todo">Todo</option>
+        <option value="In Progress">In Progress</option>
+        <option value="In Review">In Review</option>
+        <option value="Backlog" selected>Backlog</option>
+        <option value="Done">Done</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <button class="primary" id="load-btn">Load &amp; Start Triage</button>
+  </div>
+  <div id="load-error"></div>
 </div>
 
-<!-- LIST MODE -->
-<div class="fetch-panel active" id="panel-list">
-  <div class="panel-col">
-    <textarea id="issue-list-input" placeholder="Paste issue identifiers, one per line or comma-separated:&#10;YOU-21931&#10;YOU-21906, YOU-20423&#10;YOU-21787"></textarea>
-    <div class="panel-row">
-      <button id="fetch-list-btn">Load issues</button>
-      <span class="hint">Accepts any separator — comma, newline, space. Ctrl+Enter to load.</span>
+<!-- ── TRIAGE SCREEN ──────────────────────────────────────────────────────── -->
+<div id="triage-screen">
+  <div class="triage-header">
+    <h1>Triage</h1>
+    <span class="progress-text" id="progress-text">0 / 0</span>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+    <button class="hdr-btn" id="list-view-btn">List view</button>
+    <button class="hdr-btn dl" id="download-btn">⬇ Export MD</button>
+    <button class="hdr-btn" id="restart-btn">← Load new</button>
+  </div>
+
+  <div class="triage-body">
+    <div class="issue-pane" id="issue-pane">
+      <div class="pane-meta" id="pane-meta"></div>
+      <div class="pane-title" id="pane-title"></div>
+      <div class="pane-desc" id="pane-desc"></div>
+      <div class="vote-indicator" id="vote-indicator"></div>
+      <div id="saved-comment-wrap"></div>
+      <div class="comment-area" id="comment-area">
+        <textarea id="comment-input" placeholder="Leave a comment…"></textarea>
+        <div class="comment-actions">
+          <button class="comment-save" id="comment-save-btn">Save</button>
+          <button class="comment-cancel" id="comment-cancel-btn">Cancel</button>
+          <span class="comment-hint">Enter to save · Esc to cancel</span>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- VIEW MODE -->
-<div class="fetch-panel" id="panel-view">
-  <div class="panel-col">
-    <div class="panel-row">
-      <input type="text" id="view-url-input" placeholder="Paste Linear view URL — https://linear.app/…/view/…" style="flex:1" />
-      <button id="fetch-view-btn">Load view</button>
-    </div>
-    <span class="hint">Paste any Linear custom view or board URL. Issues are fetched with the view's current filters.</span>
+  <div class="triage-footer">
+    <span class="key-hint"><kbd>↑</kbd> Up-vote &amp; next</span>
+    <span class="key-hint"><kbd>↓</kbd> Down-vote &amp; next</span>
+    <span class="key-hint"><kbd>←</kbd><kbd>→</kbd> Navigate</span>
+    <span class="key-hint"><kbd>Space</kbd> Comment</span>
+    <span class="key-hint"><kbd>Esc</kbd> Clear vote</span>
   </div>
 </div>
 
-<!-- TEAM MODE -->
-<div class="fetch-panel" id="panel-team">
-  <input type="text" id="team-input" placeholder="Team key (e.g. YOU)" autocomplete="off" style="width:130px" />
-  <select id="state-filter-fetch">
-    <option value="">All states</option>
-    <option value="Todo">Todo</option>
-    <option value="In Progress">In Progress</option>
-    <option value="In Review">In Review</option>
-    <option value="Backlog" selected>Backlog</option>
-    <option value="Done">Done</option>
-    <option value="Cancelled">Cancelled</option>
-  </select>
-  <button id="fetch-team-btn">Fetch issues</button>
-</div>
-
-<div id="error-area"></div>
-
-<div class="filter-bar">
-  <button class="filter-btn active" data-vote="all">All</button>
-  <button class="filter-btn" data-vote="up">👍 Up-voted</button>
-  <button class="filter-btn" data-vote="down">👎 Down-voted</button>
-  <button class="filter-btn" data-vote="none">Unsorted</button>
-  <input type="text" id="search" placeholder="Search title…" />
-  <span class="count" id="count"></span>
-</div>
-
-<main>
-  <div id="list" class="issue-list">
-    <p class="empty">Paste issue IDs, a view URL, or pick a team above, then load.</p>
+<!-- ── LIST SCREEN ────────────────────────────────────────────────────────── -->
+<div id="list-screen">
+  <div class="list-header">
+    <button class="hdr-btn" id="triage-view-btn">← Triage</button>
+    <button class="filter-btn active" data-vote="all">All</button>
+    <button class="filter-btn" data-vote="up">👍 Up</button>
+    <button class="filter-btn" data-vote="down">👎 Down</button>
+    <button class="filter-btn" data-vote="none">Unsorted</button>
+    <input type="text" id="search" placeholder="Search…" />
+    <span class="count-label" id="count-label"></span>
+    <button class="hdr-btn dl" id="download-btn-list">⬇ Export MD</button>
+    <button class="hdr-btn" id="restart-btn-list">Load new</button>
   </div>
-</main>
+  <div class="issue-grid" id="issue-grid"></div>
+</div>
 
 <script>
-  const STORAGE_KEY = 'linear-triage-votes';
-  const TOKEN_KEY   = 'linear-triage-token';
-  const TEAM_KEY    = 'linear-triage-team';
+  const VOTES_KEY    = 'linear-triage-votes';
+  const COMMENTS_KEY = 'linear-triage-comments';
+  const TOKEN_KEY    = 'linear-triage-token';
+  const TEAM_KEY     = 'linear-triage-team';
 
-  const tokenInput    = document.getElementById('token-input');
-  const teamInput     = document.getElementById('team-input');
-  const listInput     = document.getElementById('issue-list-input');
-  const viewUrlInput  = document.getElementById('view-url-input');
-  const fetchListBtn  = document.getElementById('fetch-list-btn');
-  const fetchViewBtn  = document.getElementById('fetch-view-btn');
-  const fetchTeamBtn  = document.getElementById('fetch-team-btn');
-  const listEl        = document.getElementById('list');
-  const errorArea     = document.getElementById('error-area');
-  const countEl       = document.getElementById('count');
-  const searchEl      = document.getElementById('search');
-  const clearVotes    = document.getElementById('clear-votes-btn');
-  const stateFetch    = document.getElementById('state-filter-fetch');
+  // ── State ──────────────────────────────────────────────────────────────────
+  let issues   = [];
+  let cursor   = 0;
+  let listFilter = 'all';
+  let commentOpen = false;
 
-  let issues = [];
-  let voteFilter = 'all';
+  // ── Persistence ────────────────────────────────────────────────────────────
+  const getVotes    = () => { try { return JSON.parse(localStorage.getItem(VOTES_KEY)    || '{}'); } catch { return {}; } };
+  const getComments = () => { try { return JSON.parse(localStorage.getItem(COMMENTS_KEY) || '{}'); } catch { return {}; } };
+  function setVote(id, val)    { const v = getVotes();    if (val === null) delete v[id]; else v[id] = val; localStorage.setItem(VOTES_KEY, JSON.stringify(v)); }
+  function setComment(id, txt) { const c = getComments(); if (!txt) delete c[id]; else c[id] = txt; localStorage.setItem(COMMENTS_KEY, JSON.stringify(c)); }
 
+  // ── DOM refs ───────────────────────────────────────────────────────────────
+  const loadScreen   = document.getElementById('load-screen');
+  const triageScreen = document.getElementById('triage-screen');
+  const listScreen   = document.getElementById('list-screen');
+
+  const tokenInput   = document.getElementById('token-input');
+  const idListInput  = document.getElementById('id-list-input');
+  const viewUrlInput = document.getElementById('view-url-input');
+  const teamInput    = document.getElementById('team-input');
+  const stateSelect  = document.getElementById('state-select');
+  const loadBtn      = document.getElementById('load-btn');
+  const loadError    = document.getElementById('load-error');
+
+  const progressText = document.getElementById('progress-text');
+  const progressBar  = document.getElementById('progress-bar');
+  const issuePane    = document.getElementById('issue-pane');
+  const paneMeta     = document.getElementById('pane-meta');
+  const paneTitle    = document.getElementById('pane-title');
+  const paneDesc     = document.getElementById('pane-desc');
+  const voteIndicator = document.getElementById('vote-indicator');
+  const savedCommentWrap = document.getElementById('saved-comment-wrap');
+  const commentArea  = document.getElementById('comment-area');
+  const commentInput = document.getElementById('comment-input');
+
+  const searchInput  = document.getElementById('search');
+  const issueGrid    = document.getElementById('issue-grid');
+  const countLabel   = document.getElementById('count-label');
+
+  // Restore token
   tokenInput.value = localStorage.getItem(TOKEN_KEY) || '';
   teamInput.value  = localStorage.getItem(TEAM_KEY)  || '';
-  tokenInput.addEventListener('change', () => localStorage.setItem(TOKEN_KEY, tokenInput.value.trim()));
-  teamInput.addEventListener('change',  () => localStorage.setItem(TEAM_KEY,  teamInput.value.trim()));
 
-  document.querySelectorAll('.mode-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.fetch-panel').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('panel-' + tab.dataset.mode).classList.add('active');
-    });
-  });
-
-  function getVotes() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
-  }
-  function setVote(id, val) {
-    const v = getVotes();
-    if (val === null) delete v[id]; else v[id] = val;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(v));
-  }
-
-  clearVotes.addEventListener('click', () => {
-    if (confirm('Clear all votes?')) { localStorage.removeItem(STORAGE_KEY); renderList(); }
-  });
-
-  document.querySelectorAll('.filter-btn').forEach(btn => {
+  // ── Source mode tabs ───────────────────────────────────────────────────────
+  let srcMode = 'list';
+  document.querySelectorAll('.mode-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.mode-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.source-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
-      voteFilter = btn.dataset.vote;
-      renderList();
+      srcMode = btn.dataset.src;
+      document.getElementById('src-' + srcMode).classList.add('active');
     });
   });
-  searchEl.addEventListener('input', renderList);
 
-  const PRIORITY_COLORS = { 0: '#555', 1: '#ef4444', 2: '#f97316', 3: '#eab308', 4: '#22c55e' };
-  const PRIORITY_NAMES  = { 0: 'No priority', 1: 'Urgent', 2: 'High', 3: 'Medium', 4: 'Low' };
+  // Ctrl+Enter shortcut in list textarea
+  idListInput.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) loadBtn.click(); });
+  viewUrlInput.addEventListener('keydown', e => { if (e.key === 'Enter') loadBtn.click(); });
+  teamInput.addEventListener('keydown',    e => { if (e.key === 'Enter') loadBtn.click(); });
 
-  function relativeTime(iso) {
-    const diff = Date.now() - new Date(iso).getTime();
-    const d = Math.floor(diff / 86400000);
-    if (d === 0) return 'today';
-    if (d === 1) return 'yesterday';
-    if (d < 30)  return `${d}d ago`;
-    const m = Math.floor(d / 30);
-    return m < 12 ? `${m}mo ago` : `${Math.floor(m / 12)}y ago`;
-  }
-
-  function renderList() {
-    const votes = getVotes();
-    const query = searchEl.value.trim().toLowerCase();
-    const filtered = issues.filter(issue => {
-      const vote = votes[issue.id] || null;
-      if (voteFilter === 'up'   && vote !== 'up')  return false;
-      if (voteFilter === 'down' && vote !== 'down') return false;
-      if (voteFilter === 'none' && vote !== null)   return false;
-      if (query && !issue.title.toLowerCase().includes(query) &&
-                   !(issue.identifier || '').toLowerCase().includes(query)) return false;
-      return true;
-    });
-
-    countEl.textContent = `${filtered.length} / ${issues.length}`;
-
-    if (filtered.length === 0) {
-      listEl.innerHTML = `<p class="empty">No issues match.</p>`;
-      return;
-    }
-
-    listEl.innerHTML = filtered.map(issue => {
-      const vote    = votes[issue.id] || null;
-      const labels  = (issue.labels?.nodes || []).map(l => `<span class="label-tag">${l.name}</span>`).join('');
-      const assignee = issue.assignee ? `<span class="assignee">@${issue.assignee.displayName}</span>` : '';
-      const color   = PRIORITY_COLORS[issue.priority ?? 0];
-      const pname   = PRIORITY_NAMES[issue.priority ?? 0];
-
-      return `<div class="issue-card ${vote ? 'voted-' + vote : ''}" data-id="${issue.id}">
-        <div class="vote-col">
-          <button class="vote-btn up ${vote === 'up' ? 'active' : ''}" data-id="${issue.id}" data-dir="up" title="Up-vote">▲</button>
-          <button class="vote-btn down ${vote === 'down' ? 'active' : ''}" data-id="${issue.id}" data-dir="down" title="Down-vote">▼</button>
-        </div>
-        <div class="issue-body">
-          <div class="issue-meta">
-            <span class="priority-dot" style="background:${color}" title="${pname}"></span>
-            <span class="issue-id">${issue.identifier}</span>
-            <span class="state-badge">${issue.state?.name || ''}</span>
-          </div>
-          <div class="issue-title">
-            <a href="https://linear.app/issue/${issue.identifier}" target="_blank" rel="noopener">${issue.title}</a>
-          </div>
-          ${issue.description ? `<div class="issue-desc">${issue.description.slice(0, 120)}</div>` : ''}
-          <div class="issue-footer">
-            ${labels}${assignee}
-            <span class="created">${relativeTime(issue.createdAt)}</span>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-
-    listEl.querySelectorAll('.vote-btn').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        const id  = btn.dataset.id;
-        const dir = btn.dataset.dir;
-        const cur = getVotes()[id] || null;
-        setVote(id, cur === dir ? null : dir);
-        renderList();
-      });
-    });
-  }
-
-  const ISSUE_FIELDS = `id identifier title description priority createdAt updatedAt
-    state { name }
-    assignee { displayName }
-    labels { nodes { name } }`;
-
-  function getToken() {
-    const t = tokenInput.value.trim();
-    localStorage.setItem(TOKEN_KEY, t);
-    return t;
-  }
+  // ── API ────────────────────────────────────────────────────────────────────
+  const ISSUE_FIELDS = `id identifier title description priority createdAt
+    state { name } assignee { displayName } labels { nodes { name } }`;
 
   async function gql(token, query) {
     const res = await fetch('https://api.linear.app/graphql', {
@@ -355,138 +375,292 @@
     return json.data;
   }
 
-  function setLoading(btn, text) { btn.disabled = true; btn.dataset.orig = btn.textContent; btn.textContent = text; }
-  function clearLoading(btn)     { btn.disabled = false; btn.textContent = btn.dataset.orig || btn.textContent; }
+  // ── Load ───────────────────────────────────────────────────────────────────
+  loadBtn.addEventListener('click', async () => {
+    const token = tokenInput.value.trim();
+    if (!token) { showLoadError('Please enter a Linear API token.'); return; }
+    localStorage.setItem(TOKEN_KEY, token);
 
-  // ── LIST MODE ──────────────────────────────────────────────────────────────
-  // Linear API does not support filtering by identifier string directly.
-  // Instead we use batched aliased queries: `_0: issue(id: "YOU-1234") { ... }`
-  // The `issue` resolver accepts both UUID and human identifier.
-  fetchListBtn.addEventListener('click', fetchByList);
-  listInput.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) fetchByList(); });
-
-  async function fetchByList() {
-    const token = getToken();
-    if (!token) { showError('Please enter a Linear API token.'); return; }
-
-    const ids = [...new Set(
-      listInput.value.split(/[\s,;]+/).map(s => s.trim().toUpperCase()).filter(s => /^[A-Z]+-\d+$/.test(s))
-    )];
-    if (ids.length === 0) { showError('No valid issue identifiers found (expected format: YOU-1234)'); return; }
-
-    clearError();
-    listEl.innerHTML = `<p class="loading">Fetching ${ids.length} issue${ids.length > 1 ? 's' : ''}…</p>`;
-    setLoading(fetchListBtn, 'Loading…');
+    loadBtn.disabled = true; loadBtn.textContent = 'Loading…'; loadError.innerHTML = '';
 
     try {
-      // Batch all lookups in one request using GraphQL aliases
-      const aliasedQueries = ids.map((id, i) => `_${i}: issue(id: "${id}") { ${ISSUE_FIELDS} }`).join('\n');
-      const data = await gql(token, `{ ${aliasedQueries} }`);
+      if (srcMode === 'list') {
+        const ids = [...new Set(
+          idListInput.value.split(/[\s,;]+/).map(s => s.trim().toUpperCase()).filter(s => /^[A-Z]+-\d+$/.test(s))
+        )];
+        if (!ids.length) { showLoadError('No valid issue IDs found (format: YOU-1234)'); return; }
+        const aliases = ids.map((id, i) => `_${i}: issue(id: "${id}") { ${ISSUE_FIELDS} }`).join('\n');
+        const data = await gql(token, `{ ${aliases} }`);
+        const ordered = ids.map((id, i) => data[`_${i}`]).filter(Boolean);
+        const missing = ids.filter((_, i) => !data[`_${i}`]);
+        if (missing.length) showLoadError(`Not found: ${missing.join(', ')}`);
+        issues = ordered;
 
-      // Preserve input order; null means not found
-      const ordered = ids.map((id, i) => data[`_${i}`]).filter(Boolean);
-      const missing  = ids.filter((_, i) => !data[`_${i}`]);
+      } else if (srcMode === 'view') {
+        const url = viewUrlInput.value.trim();
+        const m = url.match(/\/view\/([a-zA-Z0-9_-]+)/);
+        if (!m) { showLoadError('Could not extract view ID from URL.'); return; }
+        const data = await gql(token, `{ customView(id: "${m[1]}") { name issues(first: 250, orderBy: updatedAt) { nodes { ${ISSUE_FIELDS} } } } }`);
+        if (!data?.customView) { showLoadError('View not found or not accessible.'); return; }
+        issues = data.customView.issues?.nodes || [];
 
-      if (missing.length) showError(`Not found: ${missing.join(', ')}`);
-      else clearError();
+      } else {
+        const team = teamInput.value.trim().toUpperCase();
+        if (!team) { showLoadError('Please enter a team key.'); return; }
+        localStorage.setItem(TEAM_KEY, team);
+        const sf = stateSelect.value ? `, filter: { state: { name: { eq: "${stateSelect.value}" } } }` : '';
+        const data = await gql(token, `{ team(id: "${team}") { issues(first: 250${sf}, orderBy: updatedAt) { nodes { ${ISSUE_FIELDS} } } } }`);
+        issues = data?.team?.issues?.nodes || [];
+      }
 
-      if (ordered.length === 0) { listEl.innerHTML = '<p class="empty">No issues found.</p>'; countEl.textContent = ''; return; }
-      issues = ordered;
-      renderList();
+      if (!issues.length) { showLoadError('No issues found.'); return; }
+      cursor = 0;
+      enterTriage();
+
     } catch (err) {
-      showError('Error: ' + err.message);
-      listEl.innerHTML = '<p class="empty">Failed to load.</p>';
+      showLoadError('Error: ' + err.message);
     } finally {
-      clearLoading(fetchListBtn);
+      loadBtn.disabled = false; loadBtn.textContent = 'Load & Start Triage';
+    }
+  });
+
+  function showLoadError(msg) { loadError.innerHTML = `<div class="error-msg">${msg}</div>`; }
+
+  // ── Screen switching ───────────────────────────────────────────────────────
+  function show(screen) {
+    loadScreen.style.display   = screen === 'load'   ? 'flex' : 'none';
+    triageScreen.style.display = screen === 'triage' ? 'flex' : 'none';
+    listScreen.style.display   = screen === 'list'   ? 'flex' : 'none';
+  }
+
+  function enterTriage() {
+    closeComment();
+    show('triage');
+    renderTriage();
+  }
+
+  document.getElementById('list-view-btn').addEventListener('click', () => { show('list'); renderList(); });
+  document.getElementById('triage-view-btn').addEventListener('click', () => { show('triage'); renderTriage(); });
+  document.getElementById('restart-btn').addEventListener('click', () => show('load'));
+  document.getElementById('restart-btn-list').addEventListener('click', () => show('load'));
+  document.getElementById('download-btn').addEventListener('click', exportMarkdown);
+  document.getElementById('download-btn-list').addEventListener('click', exportMarkdown);
+
+  // ── Triage render ──────────────────────────────────────────────────────────
+  const PRIORITY_COLORS = { 0:'#555', 1:'#ef4444', 2:'#f97316', 3:'#eab308', 4:'#22c55e' };
+  const PRIORITY_NAMES  = { 0:'No priority', 1:'Urgent', 2:'High', 3:'Medium', 4:'Low' };
+
+  function renderTriage() {
+    if (!issues.length) return;
+    cursor = Math.max(0, Math.min(cursor, issues.length - 1));
+    const issue = issues[cursor];
+    const votes = getVotes();
+    const comments = getComments();
+    const vote = votes[issue.id] || null;
+    const comment = comments[issue.id] || '';
+
+    // Progress
+    progressText.textContent = `${cursor + 1} / ${issues.length}`;
+    progressBar.style.width = `${((cursor + 1) / issues.length) * 100}%`;
+
+    // Pane class
+    issuePane.className = 'issue-pane' + (vote ? ' voted-' + vote : '');
+
+    // Meta
+    const color = PRIORITY_COLORS[issue.priority ?? 0];
+    const labels = (issue.labels?.nodes || []).map(l => `<span class="pane-label">${l.name}</span>`).join('');
+    paneMeta.innerHTML = `
+      <span class="priority-dot" style="background:${color}" title="${PRIORITY_NAMES[issue.priority ?? 0]}"></span>
+      <span class="pane-id">${issue.identifier}</span>
+      <span class="pane-state">${issue.state?.name || ''}</span>
+      ${labels}
+      ${issue.assignee ? `<span style="font-size:11px;color:#555">@${issue.assignee.displayName}</span>` : ''}
+    `;
+
+    paneTitle.innerHTML = `<a href="https://linear.app/issue/${issue.identifier}" target="_blank" rel="noopener">${issue.title}</a>`;
+    paneDesc.textContent = issue.description || '';
+    paneDesc.style.display = issue.description ? 'block' : 'none';
+
+    // Vote badge
+    if (vote === 'up')   voteIndicator.innerHTML = `<span class="vote-badge up">👍 Up-voted</span>`;
+    else if (vote === 'down') voteIndicator.innerHTML = `<span class="vote-badge down">👎 Down-voted</span>`;
+    else                 voteIndicator.innerHTML = `<span class="vote-badge none">Not voted</span>`;
+
+    // Saved comment
+    if (comment && !commentOpen) {
+      savedCommentWrap.innerHTML = `<div class="saved-comment-label">Comment</div><div class="saved-comment" id="saved-comment-el">${comment}</div>`;
+      document.getElementById('saved-comment-el')?.addEventListener('click', openComment);
+    } else {
+      savedCommentWrap.innerHTML = '';
+    }
+
+    if (commentOpen) {
+      commentArea.classList.add('open');
+      commentInput.value = comment;
+      commentInput.focus();
+    } else {
+      commentArea.classList.remove('open');
     }
   }
 
-  // ── VIEW MODE ─────────────────────────────────────────────────────────────
-  // Extracts view ID from a Linear custom view URL and fetches its issues.
-  // URL pattern: https://linear.app/{workspace}/view/{viewId}?filter=...
-  fetchViewBtn.addEventListener('click', fetchByView);
-  viewUrlInput.addEventListener('keydown', e => { if (e.key === 'Enter') fetchByView(); });
+  // ── Comment ────────────────────────────────────────────────────────────────
+  function openComment() {
+    commentOpen = true;
+    renderTriage();
+    commentInput.focus();
+    commentInput.selectionStart = commentInput.selectionEnd = commentInput.value.length;
+  }
+  function closeComment() { commentOpen = false; }
 
-  function extractViewId(url) {
-    try {
-      const u = new URL(url.trim());
-      const m = u.pathname.match(/\/view\/([a-zA-Z0-9_-]+)/);
-      return m ? m[1] : null;
-    } catch { return null; }
+  document.getElementById('comment-save-btn').addEventListener('click', saveComment);
+  document.getElementById('comment-cancel-btn').addEventListener('click', () => { closeComment(); renderTriage(); });
+  commentInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveComment(); }
+    if (e.key === 'Escape') { closeComment(); renderTriage(); }
+  });
+  function saveComment() {
+    setComment(issues[cursor].id, commentInput.value.trim());
+    closeComment(); renderTriage();
   }
 
-  async function fetchByView() {
-    const token  = getToken();
-    if (!token) { showError('Please enter a Linear API token.'); return; }
+  // ── Keyboard navigation ────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    // Only active in triage screen and not in a text input (except our controlled comment)
+    if (triageScreen.style.display === 'none') return;
+    if (commentOpen && e.target !== commentInput) return;
+    if (!commentOpen && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
+    if (commentOpen) return; // handled by commentInput listener above
 
-    const viewId = extractViewId(viewUrlInput.value);
-    if (!viewId) { showError('Could not extract view ID from URL. Expected format: https://linear.app/…/view/{id}'); return; }
-
-    clearError();
-    listEl.innerHTML = '<p class="loading">Loading view…</p>';
-    setLoading(fetchViewBtn, 'Loading…');
-
-    try {
-      const data = await gql(token, `{
-        customView(id: "${viewId}") {
-          name
-          issues(first: 250, orderBy: updatedAt) {
-            nodes { ${ISSUE_FIELDS} }
-          }
-        }
-      }`);
-
-      const view = data?.customView;
-      if (!view) { showError('View not found or not accessible with this token.'); listEl.innerHTML = '<p class="empty">View not found.</p>'; return; }
-
-      issues = view.issues?.nodes || [];
-      if (issues.length === 0) { listEl.innerHTML = `<p class="empty">No issues in "${view.name}".</p>`; countEl.textContent = '0'; return; }
-      renderList();
-    } catch (err) {
-      showError('Error: ' + err.message);
-      listEl.innerHTML = '<p class="empty">Failed to load.</p>';
-    } finally {
-      clearLoading(fetchViewBtn);
+    switch (e.key) {
+      case 'ArrowUp':
+        e.preventDefault();
+        setVote(issues[cursor].id, 'up');
+        cursor = Math.min(cursor + 1, issues.length - 1);
+        renderTriage();
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        setVote(issues[cursor].id, 'down');
+        cursor = Math.min(cursor + 1, issues.length - 1);
+        renderTriage();
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        cursor = Math.min(cursor + 1, issues.length - 1);
+        renderTriage();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        cursor = Math.max(cursor - 1, 0);
+        renderTriage();
+        break;
+      case ' ':
+        e.preventDefault();
+        openComment();
+        break;
+      case 'Escape':
+        setVote(issues[cursor].id, null);
+        renderTriage();
+        break;
     }
-  }
+  });
 
-  // ── TEAM MODE ──────────────────────────────────────────────────────────────
-  fetchTeamBtn.addEventListener('click', fetchByTeam);
-
-  async function fetchByTeam() {
-    const token = getToken();
-    const team  = teamInput.value.trim().toUpperCase();
-    if (!token) { showError('Please enter a Linear API token.'); return; }
-    if (!team)  { showError('Please enter a team key (e.g. YOU).'); return; }
-    localStorage.setItem(TEAM_KEY, teamInput.value.trim());
-
-    clearError();
-    listEl.innerHTML = '<p class="loading">Fetching issues…</p>';
-    setLoading(fetchTeamBtn, 'Loading…');
-
-    const stateFilter = stateFetch.value ? `, filter: { state: { name: { eq: "${stateFetch.value}" } } }` : '';
-
-    try {
-      const data = await gql(token, `{
-        team(id: "${team}") {
-          issues(first: 250${stateFilter}, orderBy: updatedAt) {
-            nodes { ${ISSUE_FIELDS} }
-          }
-        }
-      }`);
-      issues = data?.team?.issues?.nodes || [];
-      if (issues.length === 0) { listEl.innerHTML = '<p class="empty">No issues found.</p>'; countEl.textContent = '0'; return; }
+  // ── List view ──────────────────────────────────────────────────────────────
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      listFilter = btn.dataset.vote;
       renderList();
-    } catch (err) {
-      showError('Error: ' + err.message);
-      listEl.innerHTML = '<p class="empty">Failed to load.</p>';
-    } finally {
-      clearLoading(fetchTeamBtn);
-    }
+    });
+  });
+  searchInput.addEventListener('input', renderList);
+
+  function renderList() {
+    const votes    = getVotes();
+    const comments = getComments();
+    const q = searchInput.value.trim().toLowerCase();
+
+    const filtered = issues.filter(i => {
+      const vote = votes[i.id] || null;
+      if (listFilter === 'up'   && vote !== 'up')  return false;
+      if (listFilter === 'down' && vote !== 'down') return false;
+      if (listFilter === 'none' && vote !== null)   return false;
+      if (q && !i.title.toLowerCase().includes(q) && !(i.identifier || '').toLowerCase().includes(q)) return false;
+      return true;
+    });
+
+    countLabel.textContent = `${filtered.length} / ${issues.length}`;
+
+    issueGrid.innerHTML = filtered.map(issue => {
+      const vote = votes[issue.id] || null;
+      const comment = comments[issue.id] || '';
+      return `<div class="grid-card ${vote ? 'voted-' + vote : ''}" data-id="${issue.id}">
+        <div class="grid-vote-col">
+          <button class="grid-vote-btn up ${vote === 'up' ? 'active' : ''}" data-id="${issue.id}" data-dir="up">▲</button>
+          <button class="grid-vote-btn down ${vote === 'down' ? 'active' : ''}" data-id="${issue.id}" data-dir="down">▼</button>
+        </div>
+        <div class="grid-body">
+          <div class="grid-meta">
+            <span class="grid-id">${issue.identifier}</span>
+            <span class="grid-state">${issue.state?.name || ''}</span>
+          </div>
+          <div class="grid-title"><a href="https://linear.app/issue/${issue.identifier}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${issue.title}</a></div>
+          ${comment ? `<div class="grid-comment">${comment}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    // Click card → jump to that issue in triage
+    issueGrid.querySelectorAll('.grid-card').forEach(card => {
+      card.addEventListener('click', e => {
+        if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
+        const idx = issues.findIndex(i => i.id === card.dataset.id);
+        if (idx >= 0) { cursor = idx; enterTriage(); }
+      });
+    });
+
+    issueGrid.querySelectorAll('.grid-vote-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const cur = getVotes()[btn.dataset.id] || null;
+        setVote(btn.dataset.id, cur === btn.dataset.dir ? null : btn.dataset.dir);
+        renderList();
+      });
+    });
   }
 
-  function showError(msg) { errorArea.innerHTML = `<div class="error-msg">${msg}</div>`; }
-  function clearError()   { errorArea.innerHTML = ''; }
+  // ── Export Markdown ────────────────────────────────────────────────────────
+  function exportMarkdown() {
+    const votes    = getVotes();
+    const comments = getComments();
+    const date     = new Date().toISOString().slice(0, 10);
+
+    const up   = issues.filter(i => votes[i.id] === 'up');
+    const down = issues.filter(i => votes[i.id] === 'down');
+    const none = issues.filter(i => !votes[i.id]);
+
+    function section(title, list) {
+      if (!list.length) return '';
+      const rows = list.map(i => {
+        const comment = comments[i.id] ? `\n  > ${comments[i.id]}` : '';
+        return `- **${i.identifier}** — ${i.title}\n  [${i.state?.name || ''}] <https://linear.app/issue/${i.identifier}>${comment}`;
+      }).join('\n');
+      return `## ${title} (${list.length})\n\n${rows}\n\n`;
+    }
+
+    const md = `# Linear Triage — ${date}\n\n` +
+      `Total: ${issues.length} issues reviewed\n\n` +
+      section('👍 Up-voted', up) +
+      section('👎 Down-voted', down) +
+      section('⬜ Unsorted', none);
+
+    const blob = new Blob([md], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `linear-triage-${date}.md`;
+    a.click();
+  }
 </script>
 </body>
 </html>
