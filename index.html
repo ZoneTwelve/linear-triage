@@ -15,7 +15,7 @@
     }
 
     header {
-      padding: 16px 24px;
+      padding: 14px 24px;
       border-bottom: 1px solid #222;
       display: flex;
       align-items: center;
@@ -28,21 +28,14 @@
 
     header h1 { font-size: 18px; font-weight: 600; color: #fff; flex: 0 0 auto; }
 
-    .controls {
+    .token-row {
       display: flex;
+      gap: 8px;
       align-items: center;
-      gap: 10px;
       flex: 1;
-      flex-wrap: wrap;
     }
 
-    .api-input {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    input[type="text"], input[type="password"], select {
+    input[type="text"], input[type="password"], select, textarea {
       background: #1a1a1e;
       border: 1px solid #333;
       color: #e2e2e2;
@@ -51,11 +44,10 @@
       font-size: 13px;
       outline: none;
     }
-    input[type="text"]:focus, input[type="password"]:focus, select:focus {
+    input[type="text"]:focus, input[type="password"]:focus, select:focus, textarea:focus {
       border-color: #5865f2;
     }
-    #token-input { width: 260px; }
-    #team-input  { width: 140px; }
+    #token-input { width: 280px; }
 
     button {
       background: #5865f2;
@@ -68,14 +60,66 @@
       white-space: nowrap;
     }
     button:hover { background: #4752c4; }
+    button:disabled { opacity: 0.5; cursor: default; }
     button.secondary {
-      background: #222;
-      color: #aaa;
+      background: #1a1a1e;
+      color: #888;
       border: 1px solid #333;
     }
-    button.secondary:hover { background: #2a2a2e; color: #e2e2e2; }
-    button.active { background: #22c55e; color: #000; }
+    button.secondary:hover { background: #222; color: #e2e2e2; }
 
+    /* mode tabs */
+    .mode-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid #222;
+      padding: 0 24px;
+      background: #0f0f10;
+    }
+    .mode-tab {
+      padding: 9px 18px;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      background: none;
+      border-radius: 0;
+    }
+    .mode-tab:hover { color: #aaa; background: none; }
+    .mode-tab.active { color: #818cf8; border-bottom-color: #818cf8; background: none; }
+
+    /* fetch panels */
+    .fetch-panel {
+      display: none;
+      padding: 12px 24px;
+      border-bottom: 1px solid #1a1a1e;
+      gap: 8px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      background: #0f0f10;
+    }
+    .fetch-panel.active { display: flex; }
+
+    .list-panel-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .list-row { display: flex; gap: 8px; align-items: flex-start; }
+
+    #issue-list-input {
+      width: 100%;
+      min-height: 72px;
+      resize: vertical;
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .hint { font-size: 11px; color: #555; }
+
+    /* filter bar */
     .filter-bar {
       display: flex;
       gap: 8px;
@@ -85,7 +129,6 @@
       background: #0f0f10;
       flex-wrap: wrap;
     }
-
     .filter-btn {
       background: #1a1a1e;
       border: 1px solid #2a2a2e;
@@ -97,10 +140,8 @@
     }
     .filter-btn:hover { background: #222; color: #e2e2e2; }
     .filter-btn.active { background: #5865f2; border-color: #5865f2; color: #fff; }
-
     #search { width: 200px; }
-
-    .count { font-size: 12px; color: #666; margin-left: auto; }
+    .count { font-size: 12px; color: #555; margin-left: auto; }
 
     main { max-width: 900px; margin: 0 auto; padding: 16px 24px; }
 
@@ -119,7 +160,6 @@
     .issue-card:hover { border-color: #333; }
     .issue-card.voted-up   { border-left: 3px solid #22c55e; }
     .issue-card.voted-down { border-left: 3px solid #ef4444; }
-    .issue-card.hidden-card { display: none; }
 
     .vote-col {
       display: flex;
@@ -129,7 +169,6 @@
       flex: 0 0 auto;
       padding-top: 2px;
     }
-
     .vote-btn {
       background: none;
       border: 1px solid #2a2a2e;
@@ -158,20 +197,8 @@
       margin-bottom: 4px;
       flex-wrap: wrap;
     }
-
-    .issue-id {
-      font-size: 11px;
-      color: #555;
-      font-family: monospace;
-    }
-
-    .priority-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex: 0 0 auto;
-    }
-
+    .issue-id { font-size: 11px; color: #555; font-family: monospace; }
+    .priority-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
     .state-badge {
       font-size: 10px;
       padding: 2px 7px;
@@ -181,71 +208,17 @@
       color: #888;
       text-transform: capitalize;
     }
-
-    .issue-title {
-      font-size: 14px;
-      color: #e2e2e2;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .issue-title a {
-      color: inherit;
-      text-decoration: none;
-    }
+    .issue-title { font-size: 14px; color: #e2e2e2; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .issue-title a { color: inherit; text-decoration: none; }
     .issue-title a:hover { color: #818cf8; }
+    .issue-desc { font-size: 12px; color: #666; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .issue-footer { display: flex; gap: 8px; margin-top: 5px; align-items: center; flex-wrap: wrap; }
+    .label-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #1e1e2e; border: 1px solid #2e2e4e; color: #818cf8; }
+    .assignee { font-size: 11px; color: #555; }
+    .created { font-size: 11px; color: #444; margin-left: auto; }
 
-    .issue-desc {
-      font-size: 12px;
-      color: #666;
-      margin-top: 3px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .issue-footer {
-      display: flex;
-      gap: 8px;
-      margin-top: 5px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .label-tag {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #1e1e2e;
-      border: 1px solid #2e2e4e;
-      color: #818cf8;
-    }
-
-    .assignee {
-      font-size: 11px;
-      color: #555;
-    }
-
-    .created {
-      font-size: 11px;
-      color: #444;
-      margin-left: auto;
-    }
-
-    .empty {
-      text-align: center;
-      color: #444;
-      padding: 60px 0;
-      font-size: 14px;
-    }
-
-    .loading {
-      text-align: center;
-      color: #555;
-      padding: 40px 0;
-      font-size: 14px;
-    }
+    .empty   { text-align: center; color: #444; padding: 60px 0; font-size: 14px; }
+    .loading { text-align: center; color: #555; padding: 40px 0; font-size: 14px; }
 
     .error-msg {
       background: #2a0a0a;
@@ -253,45 +226,58 @@
       color: #f87171;
       border-radius: 6px;
       padding: 10px 14px;
-      margin: 16px 24px;
+      margin: 12px 24px 0;
       font-size: 13px;
     }
 
-    .reset-btn {
-      font-size: 11px;
-      padding: 4px 10px;
-      background: #1a1a1e;
-      border: 1px solid #333;
-      color: #888;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-left: 8px;
+    .select-all-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
-    .reset-btn:hover { color: #ef4444; border-color: #ef4444; background: #1a1a1e; }
+    .select-all-row span { font-size: 12px; color: #555; }
   </style>
 </head>
 <body>
 
 <header>
   <h1>Linear Triage</h1>
-  <div class="controls">
-    <div class="api-input">
-      <input type="password" id="token-input" placeholder="Linear API token (lin_api_…)" autocomplete="off" />
-      <input type="text"     id="team-input"  placeholder="Team key (e.g. YOU)"  autocomplete="off" />
-      <select id="state-filter-fetch">
-        <option value="">All states</option>
-        <option value="Todo">Todo</option>
-        <option value="In Progress">In Progress</option>
-        <option value="In Review">In Review</option>
-        <option value="Backlog" selected>Backlog</option>
-        <option value="Done">Done</option>
-        <option value="Cancelled">Cancelled</option>
-      </select>
-      <button id="fetch-btn">Fetch issues</button>
-    </div>
-    <button class="secondary reset-btn" id="clear-votes-btn" title="Clear all votes from localStorage">Clear votes</button>
+  <div class="token-row">
+    <input type="password" id="token-input" placeholder="Linear API token (lin_api_…)" autocomplete="off" />
+    <button class="secondary" id="clear-votes-btn">Clear votes</button>
   </div>
 </header>
+
+<div class="mode-tabs">
+  <button class="mode-tab active" data-mode="list">Issue list</button>
+  <button class="mode-tab" data-mode="team">By team</button>
+</div>
+
+<!-- LIST MODE -->
+<div class="fetch-panel active" id="panel-list">
+  <div class="list-panel-inner">
+    <textarea id="issue-list-input" placeholder="Paste issue identifiers, one per line or comma-separated:&#10;YOU-21931&#10;YOU-21906, YOU-20423&#10;YOU-21787"></textarea>
+    <div class="list-row">
+      <button id="fetch-list-btn">Load issues</button>
+      <span class="hint">Fetches each identifier via Linear API. Token saved in browser.</span>
+    </div>
+  </div>
+</div>
+
+<!-- TEAM MODE -->
+<div class="fetch-panel" id="panel-team">
+  <input type="text" id="team-input" placeholder="Team key (e.g. YOU)" autocomplete="off" style="width:130px" />
+  <select id="state-filter-fetch">
+    <option value="">All states</option>
+    <option value="Todo">Todo</option>
+    <option value="In Progress">In Progress</option>
+    <option value="In Review">In Review</option>
+    <option value="Backlog" selected>Backlog</option>
+    <option value="Done">Done</option>
+    <option value="Cancelled">Cancelled</option>
+  </select>
+  <button id="fetch-team-btn">Fetch issues</button>
+</div>
 
 <div id="error-area"></div>
 
@@ -306,7 +292,7 @@
 
 <main>
   <div id="list" class="issue-list">
-    <p class="empty">Enter your Linear API token and team key, then click Fetch.</p>
+    <p class="empty">Paste issue IDs or pick a team above, then load.</p>
   </div>
 </main>
 
@@ -315,24 +301,36 @@
   const TOKEN_KEY   = 'linear-triage-token';
   const TEAM_KEY    = 'linear-triage-team';
 
-  const tokenInput  = document.getElementById('token-input');
-  const teamInput   = document.getElementById('team-input');
-  const fetchBtn    = document.getElementById('fetch-btn');
-  const listEl      = document.getElementById('list');
-  const errorArea   = document.getElementById('error-area');
-  const countEl     = document.getElementById('count');
-  const searchEl    = document.getElementById('search');
-  const clearVotes  = document.getElementById('clear-votes-btn');
-  const stateFetch  = document.getElementById('state-filter-fetch');
+  const tokenInput   = document.getElementById('token-input');
+  const teamInput    = document.getElementById('team-input');
+  const listInput    = document.getElementById('issue-list-input');
+  const fetchListBtn = document.getElementById('fetch-list-btn');
+  const fetchTeamBtn = document.getElementById('fetch-team-btn');
+  const listEl       = document.getElementById('list');
+  const errorArea    = document.getElementById('error-area');
+  const countEl      = document.getElementById('count');
+  const searchEl     = document.getElementById('search');
+  const clearVotes   = document.getElementById('clear-votes-btn');
+  const stateFetch   = document.getElementById('state-filter-fetch');
 
   let issues = [];
   let voteFilter = 'all';
 
-  // Persist token & team across sessions
+  // Persist token & team
   tokenInput.value = localStorage.getItem(TOKEN_KEY) || '';
   teamInput.value  = localStorage.getItem(TEAM_KEY)  || '';
   tokenInput.addEventListener('change', () => localStorage.setItem(TOKEN_KEY, tokenInput.value.trim()));
   teamInput.addEventListener('change',  () => localStorage.setItem(TEAM_KEY,  teamInput.value.trim()));
+
+  // Mode tabs
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.fetch-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.mode).classList.add('active');
+    });
+  });
 
   function getVotes() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
@@ -344,13 +342,9 @@
   }
 
   clearVotes.addEventListener('click', () => {
-    if (confirm('Clear all votes?')) {
-      localStorage.removeItem(STORAGE_KEY);
-      renderList();
-    }
+    if (confirm('Clear all votes?')) { localStorage.removeItem(STORAGE_KEY); renderList(); }
   });
 
-  // Filter buttons
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -359,10 +353,8 @@
       renderList();
     });
   });
-
   searchEl.addEventListener('input', renderList);
 
-  // Priority colors
   const PRIORITY_COLORS = { 0: '#555', 1: '#ef4444', 2: '#f97316', 3: '#eab308', 4: '#22c55e' };
   const PRIORITY_NAMES  = { 0: 'No priority', 1: 'Urgent', 2: 'High', 3: 'Medium', 4: 'Low' };
 
@@ -373,25 +365,24 @@
     if (d === 1) return 'yesterday';
     if (d < 30)  return `${d}d ago`;
     const m = Math.floor(d / 30);
-    if (m < 12)  return `${m}mo ago`;
-    return `${Math.floor(m / 12)}y ago`;
+    return m < 12 ? `${m}mo ago` : `${Math.floor(m / 12)}y ago`;
   }
 
   function renderList() {
-    const votes   = getVotes();
-    const query   = searchEl.value.trim().toLowerCase();
+    const votes = getVotes();
+    const query = searchEl.value.trim().toLowerCase();
 
     const filtered = issues.filter(issue => {
       const vote = votes[issue.id] || null;
-      if (voteFilter === 'up'   && vote !== 'up')   return false;
-      if (voteFilter === 'down' && vote !== 'down')  return false;
-      if (voteFilter === 'none' && vote !== null)    return false;
+      if (voteFilter === 'up'   && vote !== 'up')  return false;
+      if (voteFilter === 'down' && vote !== 'down') return false;
+      if (voteFilter === 'none' && vote !== null)   return false;
       if (query && !issue.title.toLowerCase().includes(query) &&
                    !(issue.identifier || '').toLowerCase().includes(query)) return false;
       return true;
     });
 
-    countEl.textContent = `${filtered.length} / ${issues.length} issues`;
+    countEl.textContent = `${filtered.length} / ${issues.length}`;
 
     if (filtered.length === 0) {
       listEl.innerHTML = `<p class="empty">No issues match.</p>`;
@@ -400,12 +391,10 @@
 
     listEl.innerHTML = filtered.map(issue => {
       const vote   = votes[issue.id] || null;
-      const labels = (issue.labels?.nodes || []).map(l =>
-        `<span class="label-tag">${l.name}</span>`
-      ).join('');
+      const labels = (issue.labels?.nodes || []).map(l => `<span class="label-tag">${l.name}</span>`).join('');
       const assignee = issue.assignee ? `<span class="assignee">@${issue.assignee.displayName}</span>` : '';
-      const color    = PRIORITY_COLORS[issue.priority ?? 0];
-      const pname    = PRIORITY_NAMES[issue.priority ?? 0];
+      const color  = PRIORITY_COLORS[issue.priority ?? 0];
+      const pname  = PRIORITY_NAMES[issue.priority ?? 0];
 
       return `<div class="issue-card ${vote ? 'voted-' + vote : ''}" data-id="${issue.id}">
         <div class="vote-col">
@@ -423,100 +412,148 @@
           </div>
           ${issue.description ? `<div class="issue-desc">${issue.description.slice(0, 120)}</div>` : ''}
           <div class="issue-footer">
-            ${labels}
-            ${assignee}
+            ${labels}${assignee}
             <span class="created">${relativeTime(issue.createdAt)}</span>
           </div>
         </div>
       </div>`;
     }).join('');
 
-    // Attach vote handlers
     listEl.querySelectorAll('.vote-btn').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();
         const id  = btn.dataset.id;
         const dir = btn.dataset.dir;
         const cur = getVotes()[id] || null;
-        setVote(id, cur === dir ? null : dir);  // toggle off if same
+        setVote(id, cur === dir ? null : dir);
         renderList();
       });
     });
   }
 
-  // Linear GraphQL fetch
-  async function fetchIssues() {
-    const token = tokenInput.value.trim();
+  function getToken() {
+    const t = tokenInput.value.trim();
+    localStorage.setItem(TOKEN_KEY, t);
+    return t;
+  }
+
+  async function gql(token, query) {
+    const res = await fetch('https://api.linear.app/graphql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': token },
+      body: JSON.stringify({ query }),
+    });
+    const json = await res.json();
+    if (json.errors) throw new Error(json.errors.map(e => e.message).join(', '));
+    return json.data;
+  }
+
+  const ISSUE_FIELDS = `id identifier title description priority createdAt updatedAt
+    state { name }
+    assignee { displayName }
+    labels { nodes { name } }`;
+
+  // ── LIST MODE ──────────────────────────────────────────────────────────────
+  fetchListBtn.addEventListener('click', fetchByList);
+  listInput.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) fetchByList(); });
+
+  async function fetchByList() {
+    const token = getToken();
+    if (!token) { showError('Please enter a Linear API token.'); return; }
+
+    // Parse identifiers: split on commas, newlines, spaces, semicolons
+    const raw = listInput.value;
+    const ids = [...new Set(
+      raw.split(/[\s,;]+/).map(s => s.trim().toUpperCase()).filter(s => /^[A-Z]+-\d+$/.test(s))
+    )];
+
+    if (ids.length === 0) { showError('No valid issue identifiers found. Format: YOU-1234'); return; }
+
+    clearError();
+    listEl.innerHTML = `<p class="loading">Fetching ${ids.length} issue${ids.length > 1 ? 's' : ''}…</p>`;
+    fetchListBtn.disabled = true;
+    fetchListBtn.textContent = 'Loading…';
+
+    try {
+      // Linear supports filtering by identifier list
+      const identifierList = ids.map(id => `"${id}"`).join(', ');
+      const query = `{
+        issues(filter: { identifier: { in: [${identifierList}] } }) {
+          nodes { ${ISSUE_FIELDS} }
+        }
+      }`;
+      const data = await gql(token, query);
+      const fetched = data?.issues?.nodes || [];
+
+      // Preserve the input order
+      const byId = Object.fromEntries(fetched.map(i => [i.identifier, i]));
+      issues = ids.map(id => byId[id]).filter(Boolean);
+
+      const missing = ids.filter(id => !byId[id]);
+      if (missing.length) showError(`Not found: ${missing.join(', ')}`);
+      else clearError();
+
+      if (issues.length === 0) {
+        listEl.innerHTML = '<p class="empty">No issues found.</p>';
+        countEl.textContent = '';
+        return;
+      }
+      renderList();
+    } catch (err) {
+      showError('Error: ' + err.message);
+      listEl.innerHTML = '<p class="empty">Failed to load.</p>';
+    } finally {
+      fetchListBtn.disabled = false;
+      fetchListBtn.textContent = 'Load issues';
+    }
+  }
+
+  // ── TEAM MODE ──────────────────────────────────────────────────────────────
+  fetchTeamBtn.addEventListener('click', fetchByTeam);
+
+  async function fetchByTeam() {
+    const token = getToken();
     const team  = teamInput.value.trim().toUpperCase();
     if (!token) { showError('Please enter a Linear API token.'); return; }
     if (!team)  { showError('Please enter a team key (e.g. YOU).'); return; }
-
-    localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(TEAM_KEY,  teamInput.value.trim());
+    localStorage.setItem(TEAM_KEY, teamInput.value.trim());
 
     clearError();
     listEl.innerHTML = '<p class="loading">Fetching issues…</p>';
-    fetchBtn.disabled = true;
-    fetchBtn.textContent = 'Loading…';
+    fetchTeamBtn.disabled = true;
+    fetchTeamBtn.textContent = 'Loading…';
 
     const stateFilter = stateFetch.value
       ? `, filter: { state: { name: { eq: "${stateFetch.value}" } } }`
       : '';
 
-    const query = `{
-      team(id: "${team}") {
-        issues(first: 250${stateFilter}, orderBy: updatedAt) {
-          nodes {
-            id identifier title description priority createdAt updatedAt
-            state { name }
-            assignee { displayName }
-            labels { nodes { name } }
+    try {
+      const query = `{
+        team(id: "${team}") {
+          issues(first: 250${stateFilter}, orderBy: updatedAt) {
+            nodes { ${ISSUE_FIELDS} }
           }
         }
-      }
-    }`;
-
-    try {
-      const res = await fetch('https://api.linear.app/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': token },
-        body: JSON.stringify({ query }),
-      });
-      const json = await res.json();
-      if (json.errors) {
-        showError('Linear API error: ' + json.errors.map(e => e.message).join(', '));
-        listEl.innerHTML = '<p class="empty">Failed to load.</p>';
-        return;
-      }
-      issues = json.data?.team?.issues?.nodes || [];
+      }`;
+      const data = await gql(token, query);
+      issues = data?.team?.issues?.nodes || [];
       if (issues.length === 0) {
-        listEl.innerHTML = '<p class="empty">No issues found for that team / state filter.</p>';
+        listEl.innerHTML = '<p class="empty">No issues found.</p>';
         countEl.textContent = '0 issues';
         return;
       }
       renderList();
     } catch (err) {
-      showError('Network error: ' + err.message);
+      showError('Error: ' + err.message);
       listEl.innerHTML = '<p class="empty">Failed to load.</p>';
     } finally {
-      fetchBtn.disabled = false;
-      fetchBtn.textContent = 'Fetch issues';
+      fetchTeamBtn.disabled = false;
+      fetchTeamBtn.textContent = 'Fetch issues';
     }
   }
 
-  function showError(msg) {
-    errorArea.innerHTML = `<div class="error-msg">${msg}</div>`;
-  }
-  function clearError() {
-    errorArea.innerHTML = '';
-  }
-
-  fetchBtn.addEventListener('click', fetchIssues);
-
-  // Allow Enter in inputs to trigger fetch
-  [tokenInput, teamInput].forEach(el => {
-    el.addEventListener('keydown', e => { if (e.key === 'Enter') fetchIssues(); });
-  });
+  function showError(msg) { errorArea.innerHTML = `<div class="error-msg">${msg}</div>`; }
+  function clearError()   { errorArea.innerHTML = ''; }
 </script>
 </body>
 </html>
