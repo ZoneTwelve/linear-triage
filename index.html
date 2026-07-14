@@ -25,118 +25,54 @@
       background: #0f0f10;
       z-index: 10;
     }
-
     header h1 { font-size: 18px; font-weight: 600; color: #fff; flex: 0 0 auto; }
-
-    .token-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex: 1;
-    }
-
+    .token-row { display: flex; gap: 8px; align-items: center; flex: 1; }
     input[type="text"], input[type="password"], select, textarea {
-      background: #1a1a1e;
-      border: 1px solid #333;
-      color: #e2e2e2;
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-size: 13px;
-      outline: none;
+      background: #1a1a1e; border: 1px solid #333; color: #e2e2e2;
+      border-radius: 6px; padding: 6px 10px; font-size: 13px; outline: none;
     }
-    input[type="text"]:focus, input[type="password"]:focus, select:focus, textarea:focus {
-      border-color: #5865f2;
-    }
+    input[type="text"]:focus, input[type="password"]:focus, select:focus, textarea:focus { border-color: #5865f2; }
     #token-input { width: 280px; }
 
     button {
-      background: #5865f2;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 14px;
-      font-size: 13px;
-      cursor: pointer;
-      white-space: nowrap;
+      background: #5865f2; color: #fff; border: none; border-radius: 6px;
+      padding: 6px 14px; font-size: 13px; cursor: pointer; white-space: nowrap;
     }
     button:hover { background: #4752c4; }
     button:disabled { opacity: 0.5; cursor: default; }
-    button.secondary {
-      background: #1a1a1e;
-      color: #888;
-      border: 1px solid #333;
-    }
+    button.secondary { background: #1a1a1e; color: #888; border: 1px solid #333; }
     button.secondary:hover { background: #222; color: #e2e2e2; }
 
-    /* mode tabs */
     .mode-tabs {
-      display: flex;
-      gap: 0;
-      border-bottom: 1px solid #222;
-      padding: 0 24px;
-      background: #0f0f10;
+      display: flex; gap: 0; border-bottom: 1px solid #222;
+      padding: 0 24px; background: #0f0f10;
     }
     .mode-tab {
-      padding: 9px 18px;
-      font-size: 13px;
-      color: #666;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      background: none;
-      border-radius: 0;
+      padding: 9px 18px; font-size: 13px; color: #666; cursor: pointer;
+      border-bottom: 2px solid transparent; background: none; border-radius: 0;
     }
     .mode-tab:hover { color: #aaa; background: none; }
     .mode-tab.active { color: #818cf8; border-bottom-color: #818cf8; background: none; }
 
-    /* fetch panels */
     .fetch-panel {
-      display: none;
-      padding: 12px 24px;
-      border-bottom: 1px solid #1a1a1e;
-      gap: 8px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      background: #0f0f10;
+      display: none; padding: 12px 24px; border-bottom: 1px solid #1a1a1e;
+      gap: 8px; align-items: flex-start; flex-wrap: wrap; background: #0f0f10;
     }
     .fetch-panel.active { display: flex; }
 
-    .list-panel-inner {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      width: 100%;
-    }
-    .list-row { display: flex; gap: 8px; align-items: flex-start; }
-
-    #issue-list-input {
-      width: 100%;
-      min-height: 72px;
-      resize: vertical;
-      font-family: monospace;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
+    .panel-col { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+    .panel-row { display: flex; gap: 8px; align-items: flex-start; }
+    textarea { width: 100%; min-height: 72px; resize: vertical; font-family: monospace; font-size: 12px; line-height: 1.5; }
     .hint { font-size: 11px; color: #555; }
 
-    /* filter bar */
     .filter-bar {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      padding: 10px 24px;
-      border-bottom: 1px solid #1a1a1e;
-      background: #0f0f10;
-      flex-wrap: wrap;
+      display: flex; gap: 8px; align-items: center;
+      padding: 10px 24px; border-bottom: 1px solid #1a1a1e;
+      background: #0f0f10; flex-wrap: wrap;
     }
     .filter-btn {
-      background: #1a1a1e;
-      border: 1px solid #2a2a2e;
-      color: #aaa;
-      border-radius: 20px;
-      padding: 4px 14px;
-      font-size: 12px;
-      cursor: pointer;
+      background: #1a1a1e; border: 1px solid #2a2a2e; color: #aaa;
+      border-radius: 20px; padding: 4px 14px; font-size: 12px; cursor: pointer;
     }
     .filter-btn:hover { background: #222; color: #e2e2e2; }
     .filter-btn.active { background: #5865f2; border-color: #5865f2; color: #fff; }
@@ -144,17 +80,11 @@
     .count { font-size: 12px; color: #555; margin-left: auto; }
 
     main { max-width: 900px; margin: 0 auto; padding: 16px 24px; }
-
     .issue-list { display: flex; flex-direction: column; gap: 8px; }
 
     .issue-card {
-      background: #16161a;
-      border: 1px solid #222;
-      border-radius: 8px;
-      padding: 12px 14px;
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
+      background: #16161a; border: 1px solid #222; border-radius: 8px;
+      padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start;
       transition: border-color 0.15s;
     }
     .issue-card:hover { border-color: #333; }
@@ -162,51 +92,25 @@
     .issue-card.voted-down { border-left: 3px solid #ef4444; }
 
     .vote-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      flex: 0 0 auto;
-      padding-top: 2px;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 2px; flex: 0 0 auto; padding-top: 2px;
     }
     .vote-btn {
-      background: none;
-      border: 1px solid #2a2a2e;
-      color: #555;
-      border-radius: 4px;
-      width: 28px;
-      height: 24px;
-      padding: 0;
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.1s;
+      background: none; border: 1px solid #2a2a2e; color: #555; border-radius: 4px;
+      width: 28px; height: 24px; padding: 0; font-size: 13px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.1s;
     }
     .vote-btn:hover { background: #222; color: #aaa; border-color: #444; }
     .vote-btn.up.active   { background: #14532d; border-color: #22c55e; color: #22c55e; }
     .vote-btn.down.active { background: #450a0a; border-color: #ef4444; color: #ef4444; }
 
     .issue-body { flex: 1; min-width: 0; }
-
-    .issue-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-      flex-wrap: wrap;
-    }
+    .issue-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
     .issue-id { font-size: 11px; color: #555; font-family: monospace; }
     .priority-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
     .state-badge {
-      font-size: 10px;
-      padding: 2px 7px;
-      border-radius: 10px;
-      background: #1e1e24;
-      border: 1px solid #2a2a2e;
-      color: #888;
-      text-transform: capitalize;
+      font-size: 10px; padding: 2px 7px; border-radius: 10px;
+      background: #1e1e24; border: 1px solid #2a2a2e; color: #888; text-transform: capitalize;
     }
     .issue-title { font-size: 14px; color: #e2e2e2; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .issue-title a { color: inherit; text-decoration: none; }
@@ -219,23 +123,10 @@
 
     .empty   { text-align: center; color: #444; padding: 60px 0; font-size: 14px; }
     .loading { text-align: center; color: #555; padding: 40px 0; font-size: 14px; }
-
     .error-msg {
-      background: #2a0a0a;
-      border: 1px solid #ef4444;
-      color: #f87171;
-      border-radius: 6px;
-      padding: 10px 14px;
-      margin: 12px 24px 0;
-      font-size: 13px;
+      background: #2a0a0a; border: 1px solid #ef4444; color: #f87171;
+      border-radius: 6px; padding: 10px 14px; margin: 12px 24px 0; font-size: 13px;
     }
-
-    .select-all-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .select-all-row span { font-size: 12px; color: #555; }
   </style>
 </head>
 <body>
@@ -250,17 +141,29 @@
 
 <div class="mode-tabs">
   <button class="mode-tab active" data-mode="list">Issue list</button>
+  <button class="mode-tab" data-mode="view">By view URL</button>
   <button class="mode-tab" data-mode="team">By team</button>
 </div>
 
 <!-- LIST MODE -->
 <div class="fetch-panel active" id="panel-list">
-  <div class="list-panel-inner">
+  <div class="panel-col">
     <textarea id="issue-list-input" placeholder="Paste issue identifiers, one per line or comma-separated:&#10;YOU-21931&#10;YOU-21906, YOU-20423&#10;YOU-21787"></textarea>
-    <div class="list-row">
+    <div class="panel-row">
       <button id="fetch-list-btn">Load issues</button>
-      <span class="hint">Fetches each identifier via Linear API. Token saved in browser.</span>
+      <span class="hint">Accepts any separator — comma, newline, space. Ctrl+Enter to load.</span>
     </div>
+  </div>
+</div>
+
+<!-- VIEW MODE -->
+<div class="fetch-panel" id="panel-view">
+  <div class="panel-col">
+    <div class="panel-row">
+      <input type="text" id="view-url-input" placeholder="Paste Linear view URL — https://linear.app/…/view/…" style="flex:1" />
+      <button id="fetch-view-btn">Load view</button>
+    </div>
+    <span class="hint">Paste any Linear custom view or board URL. Issues are fetched with the view's current filters.</span>
   </div>
 </div>
 
@@ -292,7 +195,7 @@
 
 <main>
   <div id="list" class="issue-list">
-    <p class="empty">Paste issue IDs or pick a team above, then load.</p>
+    <p class="empty">Paste issue IDs, a view URL, or pick a team above, then load.</p>
   </div>
 </main>
 
@@ -301,28 +204,28 @@
   const TOKEN_KEY   = 'linear-triage-token';
   const TEAM_KEY    = 'linear-triage-team';
 
-  const tokenInput   = document.getElementById('token-input');
-  const teamInput    = document.getElementById('team-input');
-  const listInput    = document.getElementById('issue-list-input');
-  const fetchListBtn = document.getElementById('fetch-list-btn');
-  const fetchTeamBtn = document.getElementById('fetch-team-btn');
-  const listEl       = document.getElementById('list');
-  const errorArea    = document.getElementById('error-area');
-  const countEl      = document.getElementById('count');
-  const searchEl     = document.getElementById('search');
-  const clearVotes   = document.getElementById('clear-votes-btn');
-  const stateFetch   = document.getElementById('state-filter-fetch');
+  const tokenInput    = document.getElementById('token-input');
+  const teamInput     = document.getElementById('team-input');
+  const listInput     = document.getElementById('issue-list-input');
+  const viewUrlInput  = document.getElementById('view-url-input');
+  const fetchListBtn  = document.getElementById('fetch-list-btn');
+  const fetchViewBtn  = document.getElementById('fetch-view-btn');
+  const fetchTeamBtn  = document.getElementById('fetch-team-btn');
+  const listEl        = document.getElementById('list');
+  const errorArea     = document.getElementById('error-area');
+  const countEl       = document.getElementById('count');
+  const searchEl      = document.getElementById('search');
+  const clearVotes    = document.getElementById('clear-votes-btn');
+  const stateFetch    = document.getElementById('state-filter-fetch');
 
   let issues = [];
   let voteFilter = 'all';
 
-  // Persist token & team
   tokenInput.value = localStorage.getItem(TOKEN_KEY) || '';
   teamInput.value  = localStorage.getItem(TEAM_KEY)  || '';
   tokenInput.addEventListener('change', () => localStorage.setItem(TOKEN_KEY, tokenInput.value.trim()));
   teamInput.addEventListener('change',  () => localStorage.setItem(TEAM_KEY,  teamInput.value.trim()));
 
-  // Mode tabs
   document.querySelectorAll('.mode-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
@@ -371,7 +274,6 @@
   function renderList() {
     const votes = getVotes();
     const query = searchEl.value.trim().toLowerCase();
-
     const filtered = issues.filter(issue => {
       const vote = votes[issue.id] || null;
       if (voteFilter === 'up'   && vote !== 'up')  return false;
@@ -390,11 +292,11 @@
     }
 
     listEl.innerHTML = filtered.map(issue => {
-      const vote   = votes[issue.id] || null;
-      const labels = (issue.labels?.nodes || []).map(l => `<span class="label-tag">${l.name}</span>`).join('');
+      const vote    = votes[issue.id] || null;
+      const labels  = (issue.labels?.nodes || []).map(l => `<span class="label-tag">${l.name}</span>`).join('');
       const assignee = issue.assignee ? `<span class="assignee">@${issue.assignee.displayName}</span>` : '';
-      const color  = PRIORITY_COLORS[issue.priority ?? 0];
-      const pname  = PRIORITY_NAMES[issue.priority ?? 0];
+      const color   = PRIORITY_COLORS[issue.priority ?? 0];
+      const pname   = PRIORITY_NAMES[issue.priority ?? 0];
 
       return `<div class="issue-card ${vote ? 'voted-' + vote : ''}" data-id="${issue.id}">
         <div class="vote-col">
@@ -431,6 +333,11 @@
     });
   }
 
+  const ISSUE_FIELDS = `id identifier title description priority createdAt updatedAt
+    state { name }
+    assignee { displayName }
+    labels { nodes { name } }`;
+
   function getToken() {
     const t = tokenInput.value.trim();
     localStorage.setItem(TOKEN_KEY, t);
@@ -448,12 +355,13 @@
     return json.data;
   }
 
-  const ISSUE_FIELDS = `id identifier title description priority createdAt updatedAt
-    state { name }
-    assignee { displayName }
-    labels { nodes { name } }`;
+  function setLoading(btn, text) { btn.disabled = true; btn.dataset.orig = btn.textContent; btn.textContent = text; }
+  function clearLoading(btn)     { btn.disabled = false; btn.textContent = btn.dataset.orig || btn.textContent; }
 
   // ── LIST MODE ──────────────────────────────────────────────────────────────
+  // Linear API does not support filtering by identifier string directly.
+  // Instead we use batched aliased queries: `_0: issue(id: "YOU-1234") { ... }`
+  // The `issue` resolver accepts both UUID and human identifier.
   fetchListBtn.addEventListener('click', fetchByList);
   listInput.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) fetchByList(); });
 
@@ -461,50 +369,84 @@
     const token = getToken();
     if (!token) { showError('Please enter a Linear API token.'); return; }
 
-    // Parse identifiers: split on commas, newlines, spaces, semicolons
-    const raw = listInput.value;
     const ids = [...new Set(
-      raw.split(/[\s,;]+/).map(s => s.trim().toUpperCase()).filter(s => /^[A-Z]+-\d+$/.test(s))
+      listInput.value.split(/[\s,;]+/).map(s => s.trim().toUpperCase()).filter(s => /^[A-Z]+-\d+$/.test(s))
     )];
-
-    if (ids.length === 0) { showError('No valid issue identifiers found. Format: YOU-1234'); return; }
+    if (ids.length === 0) { showError('No valid issue identifiers found (expected format: YOU-1234)'); return; }
 
     clearError();
     listEl.innerHTML = `<p class="loading">Fetching ${ids.length} issue${ids.length > 1 ? 's' : ''}…</p>`;
-    fetchListBtn.disabled = true;
-    fetchListBtn.textContent = 'Loading…';
+    setLoading(fetchListBtn, 'Loading…');
 
     try {
-      // Linear supports filtering by identifier list
-      const identifierList = ids.map(id => `"${id}"`).join(', ');
-      const query = `{
-        issues(filter: { identifier: { in: [${identifierList}] } }) {
-          nodes { ${ISSUE_FIELDS} }
-        }
-      }`;
-      const data = await gql(token, query);
-      const fetched = data?.issues?.nodes || [];
+      // Batch all lookups in one request using GraphQL aliases
+      const aliasedQueries = ids.map((id, i) => `_${i}: issue(id: "${id}") { ${ISSUE_FIELDS} }`).join('\n');
+      const data = await gql(token, `{ ${aliasedQueries} }`);
 
-      // Preserve the input order
-      const byId = Object.fromEntries(fetched.map(i => [i.identifier, i]));
-      issues = ids.map(id => byId[id]).filter(Boolean);
+      // Preserve input order; null means not found
+      const ordered = ids.map((id, i) => data[`_${i}`]).filter(Boolean);
+      const missing  = ids.filter((_, i) => !data[`_${i}`]);
 
-      const missing = ids.filter(id => !byId[id]);
       if (missing.length) showError(`Not found: ${missing.join(', ')}`);
       else clearError();
 
-      if (issues.length === 0) {
-        listEl.innerHTML = '<p class="empty">No issues found.</p>';
-        countEl.textContent = '';
-        return;
-      }
+      if (ordered.length === 0) { listEl.innerHTML = '<p class="empty">No issues found.</p>'; countEl.textContent = ''; return; }
+      issues = ordered;
       renderList();
     } catch (err) {
       showError('Error: ' + err.message);
       listEl.innerHTML = '<p class="empty">Failed to load.</p>';
     } finally {
-      fetchListBtn.disabled = false;
-      fetchListBtn.textContent = 'Load issues';
+      clearLoading(fetchListBtn);
+    }
+  }
+
+  // ── VIEW MODE ─────────────────────────────────────────────────────────────
+  // Extracts view ID from a Linear custom view URL and fetches its issues.
+  // URL pattern: https://linear.app/{workspace}/view/{viewId}?filter=...
+  fetchViewBtn.addEventListener('click', fetchByView);
+  viewUrlInput.addEventListener('keydown', e => { if (e.key === 'Enter') fetchByView(); });
+
+  function extractViewId(url) {
+    try {
+      const u = new URL(url.trim());
+      const m = u.pathname.match(/\/view\/([a-zA-Z0-9_-]+)/);
+      return m ? m[1] : null;
+    } catch { return null; }
+  }
+
+  async function fetchByView() {
+    const token  = getToken();
+    if (!token) { showError('Please enter a Linear API token.'); return; }
+
+    const viewId = extractViewId(viewUrlInput.value);
+    if (!viewId) { showError('Could not extract view ID from URL. Expected format: https://linear.app/…/view/{id}'); return; }
+
+    clearError();
+    listEl.innerHTML = '<p class="loading">Loading view…</p>';
+    setLoading(fetchViewBtn, 'Loading…');
+
+    try {
+      const data = await gql(token, `{
+        customView(id: "${viewId}") {
+          name
+          issues(first: 250, orderBy: updatedAt) {
+            nodes { ${ISSUE_FIELDS} }
+          }
+        }
+      }`);
+
+      const view = data?.customView;
+      if (!view) { showError('View not found or not accessible with this token.'); listEl.innerHTML = '<p class="empty">View not found.</p>'; return; }
+
+      issues = view.issues?.nodes || [];
+      if (issues.length === 0) { listEl.innerHTML = `<p class="empty">No issues in "${view.name}".</p>`; countEl.textContent = '0'; return; }
+      renderList();
+    } catch (err) {
+      showError('Error: ' + err.message);
+      listEl.innerHTML = '<p class="empty">Failed to load.</p>';
+    } finally {
+      clearLoading(fetchViewBtn);
     }
   }
 
@@ -520,35 +462,26 @@
 
     clearError();
     listEl.innerHTML = '<p class="loading">Fetching issues…</p>';
-    fetchTeamBtn.disabled = true;
-    fetchTeamBtn.textContent = 'Loading…';
+    setLoading(fetchTeamBtn, 'Loading…');
 
-    const stateFilter = stateFetch.value
-      ? `, filter: { state: { name: { eq: "${stateFetch.value}" } } }`
-      : '';
+    const stateFilter = stateFetch.value ? `, filter: { state: { name: { eq: "${stateFetch.value}" } } }` : '';
 
     try {
-      const query = `{
+      const data = await gql(token, `{
         team(id: "${team}") {
           issues(first: 250${stateFilter}, orderBy: updatedAt) {
             nodes { ${ISSUE_FIELDS} }
           }
         }
-      }`;
-      const data = await gql(token, query);
+      }`);
       issues = data?.team?.issues?.nodes || [];
-      if (issues.length === 0) {
-        listEl.innerHTML = '<p class="empty">No issues found.</p>';
-        countEl.textContent = '0 issues';
-        return;
-      }
+      if (issues.length === 0) { listEl.innerHTML = '<p class="empty">No issues found.</p>'; countEl.textContent = '0'; return; }
       renderList();
     } catch (err) {
       showError('Error: ' + err.message);
       listEl.innerHTML = '<p class="empty">Failed to load.</p>';
     } finally {
-      fetchTeamBtn.disabled = false;
-      fetchTeamBtn.textContent = 'Fetch issues';
+      clearLoading(fetchTeamBtn);
     }
   }
 
