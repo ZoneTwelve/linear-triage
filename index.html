@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linear Triage</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f0f10;
+      color: #e2e2e2;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #222;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      background: #0f0f10;
+      z-index: 10;
+    }
+
+    header h1 { font-size: 18px; font-weight: 600; color: #fff; flex: 0 0 auto; }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      flex-wrap: wrap;
+    }
+
+    .api-input {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    input[type="text"], input[type="password"], select {
+      background: #1a1a1e;
+      border: 1px solid #333;
+      color: #e2e2e2;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 13px;
+      outline: none;
+    }
+    input[type="text"]:focus, input[type="password"]:focus, select:focus {
+      border-color: #5865f2;
+    }
+    #token-input { width: 260px; }
+    #team-input  { width: 140px; }
+
+    button {
+      background: #5865f2;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button:hover { background: #4752c4; }
+    button.secondary {
+      background: #222;
+      color: #aaa;
+      border: 1px solid #333;
+    }
+    button.secondary:hover { background: #2a2a2e; color: #e2e2e2; }
+    button.active { background: #22c55e; color: #000; }
+
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 24px;
+      border-bottom: 1px solid #1a1a1e;
+      background: #0f0f10;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: #1a1a1e;
+      border: 1px solid #2a2a2e;
+      color: #aaa;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .filter-btn:hover { background: #222; color: #e2e2e2; }
+    .filter-btn.active { background: #5865f2; border-color: #5865f2; color: #fff; }
+
+    #search { width: 200px; }
+
+    .count { font-size: 12px; color: #666; margin-left: auto; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 16px 24px; }
+
+    .issue-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .issue-card {
+      background: #16161a;
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      transition: border-color 0.15s;
+    }
+    .issue-card:hover { border-color: #333; }
+    .issue-card.voted-up   { border-left: 3px solid #22c55e; }
+    .issue-card.voted-down { border-left: 3px solid #ef4444; }
+    .issue-card.hidden-card { display: none; }
+
+    .vote-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      flex: 0 0 auto;
+      padding-top: 2px;
+    }
+
+    .vote-btn {
+      background: none;
+      border: 1px solid #2a2a2e;
+      color: #555;
+      border-radius: 4px;
+      width: 28px;
+      height: 24px;
+      padding: 0;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s;
+    }
+    .vote-btn:hover { background: #222; color: #aaa; border-color: #444; }
+    .vote-btn.up.active   { background: #14532d; border-color: #22c55e; color: #22c55e; }
+    .vote-btn.down.active { background: #450a0a; border-color: #ef4444; color: #ef4444; }
+
+    .issue-body { flex: 1; min-width: 0; }
+
+    .issue-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .issue-id {
+      font-size: 11px;
+      color: #555;
+      font-family: monospace;
+    }
+
+    .priority-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+
+    .state-badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: #1e1e24;
+      border: 1px solid #2a2a2e;
+      color: #888;
+      text-transform: capitalize;
+    }
+
+    .issue-title {
+      font-size: 14px;
+      color: #e2e2e2;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .issue-title a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .issue-title a:hover { color: #818cf8; }
+
+    .issue-desc {
+      font-size: 12px;
+      color: #666;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .issue-footer {
+      display: flex;
+      gap: 8px;
+      margin-top: 5px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .label-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #1e1e2e;
+      border: 1px solid #2e2e4e;
+      color: #818cf8;
+    }
+
+    .assignee {
+      font-size: 11px;
+      color: #555;
+    }
+
+    .created {
+      font-size: 11px;
+      color: #444;
+      margin-left: auto;
+    }
+
+    .empty {
+      text-align: center;
+      color: #444;
+      padding: 60px 0;
+      font-size: 14px;
+    }
+
+    .loading {
+      text-align: center;
+      color: #555;
+      padding: 40px 0;
+      font-size: 14px;
+    }
+
+    .error-msg {
+      background: #2a0a0a;
+      border: 1px solid #ef4444;
+      color: #f87171;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 16px 24px;
+      font-size: 13px;
+    }
+
+    .reset-btn {
+      font-size: 11px;
+      padding: 4px 10px;
+      background: #1a1a1e;
+      border: 1px solid #333;
+      color: #888;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .reset-btn:hover { color: #ef4444; border-color: #ef4444; background: #1a1a1e; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Linear Triage</h1>
+  <div class="controls">
+    <div class="api-input">
+      <input type="password" id="token-input" placeholder="Linear API token (lin_api_…)" autocomplete="off" />
+      <input type="text"     id="team-input"  placeholder="Team key (e.g. YOU)"  autocomplete="off" />
+      <select id="state-filter-fetch">
+        <option value="">All states</option>
+        <option value="Todo">Todo</option>
+        <option value="In Progress">In Progress</option>
+        <option value="In Review">In Review</option>
+        <option value="Backlog" selected>Backlog</option>
+        <option value="Done">Done</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+      <button id="fetch-btn">Fetch issues</button>
+    </div>
+    <button class="secondary reset-btn" id="clear-votes-btn" title="Clear all votes from localStorage">Clear votes</button>
+  </div>
+</header>
+
+<div id="error-area"></div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" data-vote="all">All</button>
+  <button class="filter-btn" data-vote="up">👍 Up-voted</button>
+  <button class="filter-btn" data-vote="down">👎 Down-voted</button>
+  <button class="filter-btn" data-vote="none">Unsorted</button>
+  <input type="text" id="search" placeholder="Search title…" />
+  <span class="count" id="count"></span>
+</div>
+
+<main>
+  <div id="list" class="issue-list">
+    <p class="empty">Enter your Linear API token and team key, then click Fetch.</p>
+  </div>
+</main>
+
+<script>
+  const STORAGE_KEY = 'linear-triage-votes';
+  const TOKEN_KEY   = 'linear-triage-token';
+  const TEAM_KEY    = 'linear-triage-team';
+
+  const tokenInput  = document.getElementById('token-input');
+  const teamInput   = document.getElementById('team-input');
+  const fetchBtn    = document.getElementById('fetch-btn');
+  const listEl      = document.getElementById('list');
+  const errorArea   = document.getElementById('error-area');
+  const countEl     = document.getElementById('count');
+  const searchEl    = document.getElementById('search');
+  const clearVotes  = document.getElementById('clear-votes-btn');
+  const stateFetch  = document.getElementById('state-filter-fetch');
+
+  let issues = [];
+  let voteFilter = 'all';
+
+  // Persist token & team across sessions
+  tokenInput.value = localStorage.getItem(TOKEN_KEY) || '';
+  teamInput.value  = localStorage.getItem(TEAM_KEY)  || '';
+  tokenInput.addEventListener('change', () => localStorage.setItem(TOKEN_KEY, tokenInput.value.trim()));
+  teamInput.addEventListener('change',  () => localStorage.setItem(TEAM_KEY,  teamInput.value.trim()));
+
+  function getVotes() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+  }
+  function setVote(id, val) {
+    const v = getVotes();
+    if (val === null) delete v[id]; else v[id] = val;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(v));
+  }
+
+  clearVotes.addEventListener('click', () => {
+    if (confirm('Clear all votes?')) {
+      localStorage.removeItem(STORAGE_KEY);
+      renderList();
+    }
+  });
+
+  // Filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      voteFilter = btn.dataset.vote;
+      renderList();
+    });
+  });
+
+  searchEl.addEventListener('input', renderList);
+
+  // Priority colors
+  const PRIORITY_COLORS = { 0: '#555', 1: '#ef4444', 2: '#f97316', 3: '#eab308', 4: '#22c55e' };
+  const PRIORITY_NAMES  = { 0: 'No priority', 1: 'Urgent', 2: 'High', 3: 'Medium', 4: 'Low' };
+
+  function relativeTime(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const d = Math.floor(diff / 86400000);
+    if (d === 0) return 'today';
+    if (d === 1) return 'yesterday';
+    if (d < 30)  return `${d}d ago`;
+    const m = Math.floor(d / 30);
+    if (m < 12)  return `${m}mo ago`;
+    return `${Math.floor(m / 12)}y ago`;
+  }
+
+  function renderList() {
+    const votes   = getVotes();
+    const query   = searchEl.value.trim().toLowerCase();
+
+    const filtered = issues.filter(issue => {
+      const vote = votes[issue.id] || null;
+      if (voteFilter === 'up'   && vote !== 'up')   return false;
+      if (voteFilter === 'down' && vote !== 'down')  return false;
+      if (voteFilter === 'none' && vote !== null)    return false;
+      if (query && !issue.title.toLowerCase().includes(query) &&
+                   !(issue.identifier || '').toLowerCase().includes(query)) return false;
+      return true;
+    });
+
+    countEl.textContent = `${filtered.length} / ${issues.length} issues`;
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = `<p class="empty">No issues match.</p>`;
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(issue => {
+      const vote   = votes[issue.id] || null;
+      const labels = (issue.labels?.nodes || []).map(l =>
+        `<span class="label-tag">${l.name}</span>`
+      ).join('');
+      const assignee = issue.assignee ? `<span class="assignee">@${issue.assignee.displayName}</span>` : '';
+      const color    = PRIORITY_COLORS[issue.priority ?? 0];
+      const pname    = PRIORITY_NAMES[issue.priority ?? 0];
+
+      return `<div class="issue-card ${vote ? 'voted-' + vote : ''}" data-id="${issue.id}">
+        <div class="vote-col">
+          <button class="vote-btn up ${vote === 'up' ? 'active' : ''}" data-id="${issue.id}" data-dir="up" title="Up-vote">▲</button>
+          <button class="vote-btn down ${vote === 'down' ? 'active' : ''}" data-id="${issue.id}" data-dir="down" title="Down-vote">▼</button>
+        </div>
+        <div class="issue-body">
+          <div class="issue-meta">
+            <span class="priority-dot" style="background:${color}" title="${pname}"></span>
+            <span class="issue-id">${issue.identifier}</span>
+            <span class="state-badge">${issue.state?.name || ''}</span>
+          </div>
+          <div class="issue-title">
+            <a href="https://linear.app/issue/${issue.identifier}" target="_blank" rel="noopener">${issue.title}</a>
+          </div>
+          ${issue.description ? `<div class="issue-desc">${issue.description.slice(0, 120)}</div>` : ''}
+          <div class="issue-footer">
+            ${labels}
+            ${assignee}
+            <span class="created">${relativeTime(issue.createdAt)}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Attach vote handlers
+    listEl.querySelectorAll('.vote-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id  = btn.dataset.id;
+        const dir = btn.dataset.dir;
+        const cur = getVotes()[id] || null;
+        setVote(id, cur === dir ? null : dir);  // toggle off if same
+        renderList();
+      });
+    });
+  }
+
+  // Linear GraphQL fetch
+  async function fetchIssues() {
+    const token = tokenInput.value.trim();
+    const team  = teamInput.value.trim().toUpperCase();
+    if (!token) { showError('Please enter a Linear API token.'); return; }
+    if (!team)  { showError('Please enter a team key (e.g. YOU).'); return; }
+
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(TEAM_KEY,  teamInput.value.trim());
+
+    clearError();
+    listEl.innerHTML = '<p class="loading">Fetching issues…</p>';
+    fetchBtn.disabled = true;
+    fetchBtn.textContent = 'Loading…';
+
+    const stateFilter = stateFetch.value
+      ? `, filter: { state: { name: { eq: "${stateFetch.value}" } } }`
+      : '';
+
+    const query = `{
+      team(id: "${team}") {
+        issues(first: 250${stateFilter}, orderBy: updatedAt) {
+          nodes {
+            id identifier title description priority createdAt updatedAt
+            state { name }
+            assignee { displayName }
+            labels { nodes { name } }
+          }
+        }
+      }
+    }`;
+
+    try {
+      const res = await fetch('https://api.linear.app/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': token },
+        body: JSON.stringify({ query }),
+      });
+      const json = await res.json();
+      if (json.errors) {
+        showError('Linear API error: ' + json.errors.map(e => e.message).join(', '));
+        listEl.innerHTML = '<p class="empty">Failed to load.</p>';
+        return;
+      }
+      issues = json.data?.team?.issues?.nodes || [];
+      if (issues.length === 0) {
+        listEl.innerHTML = '<p class="empty">No issues found for that team / state filter.</p>';
+        countEl.textContent = '0 issues';
+        return;
+      }
+      renderList();
+    } catch (err) {
+      showError('Network error: ' + err.message);
+      listEl.innerHTML = '<p class="empty">Failed to load.</p>';
+    } finally {
+      fetchBtn.disabled = false;
+      fetchBtn.textContent = 'Fetch issues';
+    }
+  }
+
+  function showError(msg) {
+    errorArea.innerHTML = `<div class="error-msg">${msg}</div>`;
+  }
+  function clearError() {
+    errorArea.innerHTML = '';
+  }
+
+  fetchBtn.addEventListener('click', fetchIssues);
+
+  // Allow Enter in inputs to trigger fetch
+  [tokenInput, teamInput].forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') fetchIssues(); });
+  });
+</script>
+</body>
+</html>
